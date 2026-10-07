@@ -7,10 +7,25 @@ from component import game
 from content import TITLE, SUBTITLE, NOTICE, SOURCE, CHAPTERS, NPCS, MAPS, ENDING
 from engine import new_state, verify_pin, handle, public_state, validate_state, score, objective
 from storage import Store
+# ===== 시트 주소 설정 (app.py 안에 직접 넣기) =====
+# 방법 1: 아래 SHEET_ID에 시트 ID만 넣으세요. 예: "1AbCdEfGhIjKlMnOpQrStUvWx"
+# 방법 2: 전체 URL을 복사했다면 SHEET_URL에 넣으세요. 예: "https://docs.google.com/spreadsheets/d/1AbC.../edit"
+SHEET_ID = "여기에_시트_ID_붙여넣기"
+SHEET_URL = ""
+def _extract_sheet_id(value):
+    m = re.search(r"/d/([a-zA-Z0-9-_]+)", value or "")
+    if m:
+        return m.group(1)
+    v = (value or "").strip()
+    return v
 st.set_page_config(page_title=TITLE,page_icon='🏡',layout='wide',initial_sidebar_state='collapsed')
 st.markdown('<style>.block-container{max-width:1140px;padding-top:1.2rem;padding-bottom:1rem}h1{font-size:1.7rem!important}div[data-testid="stMetricValue"]{font-size:1.6rem}</style>',unsafe_allow_html=True)
 try:config=st.secrets.to_dict()
 except Exception:config={}
+# app.py 상수 하드코딩: Secrets에 sheet_id가 없어도 여기서 넣은 주소를 사용합니다.
+_hardcoded_id = _extract_sheet_id(SHEET_URL) if SHEET_URL.strip() else _extract_sheet_id(SHEET_ID)
+if _hardcoded_id and not _hardcoded_id.startswith("여기에_"):
+    config["sheet_id"] = _hardcoded_id
 @st.cache_resource
 def make_store(config_json):
     return Store(json.loads(config_json))
@@ -105,7 +120,7 @@ if 'state' not in st.session_state:
             except (ValueError,KeyError,TypeError):st.error('기존 저장 기록의 형식이 올바르지 않아요. 교사에게 문의하세요.')
             if store.error:st.warning(store.error)
     with st.expander('개인 저장파일에서 복원합니다.'):
-        upload=st.file_uploader('본인의 미래마을 저장파일을 선택하세요.',type=['json'])
+        upload=st.file_uploader('본인의 미래마을 JSON 저장파일을 선택하세요.',type=['json'])
         filepin=st.text_input('파일의 저장 비밀번호를 입력하세요.',type='password',key='file_pin')
         if st.button('저장파일을 복원합니다.'):
             try:

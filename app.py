@@ -105,7 +105,7 @@ if 'state' not in st.session_state:
             except (ValueError,KeyError,TypeError):st.error('기존 저장 기록의 형식이 올바르지 않아요. 교사에게 문의하세요.')
             if store.error:st.warning(store.error)
     with st.expander('개인 저장파일에서 복원합니다.'):
-        upload=st.file_uploader('본인의 미래마을 JSON 저장파일을 선택하세요.',type=['json'])
+        upload=st.file_uploader('본인의 미래마을 저장파일을 선택하세요.',type=['json'])
         filepin=st.text_input('파일의 저장 비밀번호를 입력하세요.',type='password',key='file_pin')
         if st.button('저장파일을 복원합니다.'):
             try:

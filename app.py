@@ -11,7 +11,7 @@ from storage import Store
 # 방법 1: 아래 SHEET_ID에 시트 ID만 넣으세요. 예: "1AbCdEfGhIjKlMnOpQrStUvWx"
 # 방법 2: 전체 URL을 복사했다면 SHEET_URL에 넣으세요. 예: "https://docs.google.com/spreadsheets/d/1AbC.../edit"
 SHEET_ID = "여기에_시트_ID_붙여넣기"
-SHEET_URL = "https://docs.google.com/spreadsheets/d/153iTRzhQVQVFfj_LKOM4Qt9Za-H4mxZYb7Pi-pY94mA/edit?gid=0#gid=0"
+SHEET_URL = "https://docs.google.com/spreadsheets/d/153iTRzhQVQVFfj_LKOM4Qt9Za-H4mxZYb7Pi-pY94mA/edit"
 def _extract_sheet_id(value):
     m = re.search(r"/d/([a-zA-Z0-9-_]+)", value or "")
     if m:

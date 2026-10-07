@@ -1,311 +1,158 @@
-# -*- coding: utf-8 -*-
-"""미래마을을 구해라! 생애설계 어드벤처 (Streamlit + GitHub + Google Sheets)"""
-import time
+"""실행: streamlit run app.py"""
+import copy, csv, hashlib, hmac, io, json, re, time
+from pathlib import Path
+import pandas as pd
 import streamlit as st
+from component import game
+from content import TITLE, SUBTITLE, NOTICE, SOURCE, CHAPTERS, NPCS, MAPS, ENDING
+from engine import new_state, verify_pin, handle, public_state, validate_state, score, objective
+from storage import Store
+st.set_page_config(page_title=TITLE,page_icon='🏡',layout='wide',initial_sidebar_state='collapsed')
+st.markdown('<style>.block-container{max-width:1140px;padding-top:1.2rem;padding-bottom:1rem}h1{font-size:1.7rem!important}div[data-testid="stMetricValue"]{font-size:1.6rem}</style>',unsafe_allow_html=True)
+try:config=st.secrets.to_dict()
+except Exception:config={}
+@st.cache_resource
+def make_store(config_json):
+    return Store(json.loads(config_json))
+store=make_store(json.dumps(config,sort_keys=True))
 
-import game_data as GD
-import logic as LG
-import sheets as SH
+def sync_state(s):
+    st.session_state.state=s
+    for k in ('student_id','class_code','nickname','x','y','chapter','flags','stats','start_time'):
+        st.session_state[k]=copy.deepcopy(s[k])
 
-st.set_page_config(page_title="미래마을을 구해라!", page_icon="🏘️", layout="wide")
+def enter(s,event):
+    sync_state(s);st.session_state.last_event=None
+    st.session_state.ui={'type':'notice','title':'미래마을에 오신 것을 환영해요.','text':NOTICE,'lines':['예상 플레이 시간은 15~20분입니다. 방향키는 게임 화면을 한 번 눌러야 작동합니다. 개인정보 보호를 위해 실명 대신 별명을 쓰세요.'], 'next':objective(s)}
+    st.session_state.save_status=store.save(s,event)
+    st.rerun()
 
-# ---------- 세션 초기화 ----------
-def init_state():
-    d = {"authed": False, "student_id": "", "class_code": "", "nickname": "",
-         "zone": 0, "px": 4, "py": 7, "chapter_idx": 0, "stats": LG.init_stats(),
-         "flags": [], "history": [], "quiz_idx": 0, "quiz_score": 0,
-         "quiz_done": False, "ended": False, "ending": None, "start_time": time.time(),
-         "talk_npc": None, "save_msg": ""}
-    for k, v in d.items():
-        if k not in st.session_state:
-            st.session_state[k] = v
-
-init_state()
-S = st.session_state
-
-# ---------- 스타일 ----------
-st.markdown("""
-<style>
-.map-grid {font-size:26px; line-height:1.15; letter-spacing:2px;}
-.hud {background:#f0f7ff; padding:10px 14px; border-radius:12px; border:1px solid #cfe3ff;}
-.talk {background:#fffbe6; padding:10px 14px; border-radius:12px; border:1px solid #ffe58f;}
-.ending-big {font-size:30px; font-weight:800; color:#1a56db; text-align:center;}
-</style>
-""", unsafe_allow_html=True)
-
-# ---------- HUD ----------
-def hud():
-    s = S.stats
-    final, delta, bonus = LG.calc_tfr(s, S.flags)
-    sign = "+" if delta >= 0 else ""
-    st.markdown(f"""<div class="hud">
-    <b>🏘️ {GD.ZONES[S.zone]['name']}</b> | 👤 {S.class_code} {S.student_id} {S.nickname} |
-    👶 내 자녀 {s['my_children']}명 | 📈 TFR 기여도 <b>{sign}{delta}</b> (최종 {final}) |
-    🏫 학교: {LG.school_status(s)}
-    </div>""", unsafe_allow_html=True)
-    c1, c2, c3, c4, c5 = st.columns(5)
-    c1.metric("마을출산율", f"{s['birth_village']:.2f}", help="시작 1.30")
-    c2.metric("고령화율", f"{s['aging']:.1f}%", help="14% 고령사회, 20% 초고령")
-    c3.progress(min(100, max(0, s["vitality"])) / 100, f"활력 {s['vitality']}")
-    c4.progress(min(100, max(0, s["happiness"])) / 100, f"행복 {s['happiness']}")
-    c5.progress(min(100, max(0, s["burden"])) / 100, f"돌봄부담 {s['burden']}")
-
-def current_npcs():
-    return [n for n in GD.NPCS if n["zone"] == S.zone]
-
-def render_map():
-    z = GD.ZONES[S.zone]
-    w, h = z["w"], z["h"]
-    npcs = {(n["x"], n["y"]): n for n in current_npcs()}
-    # 포탈 위치 표시
-    portals = {(x, y): tgt for (zz, x, y), tgt in GD.PORTALS.items() if zz == S.zone}
-    rows = []
-    for y in range(h):
-        row = ""
-        for x in range(w):
-            if x == S.px and y == S.py:
-                row += "🧑‍🎓"
-            elif (x, y) in npcs:
-                row += npcs[(x, y)]["emoji"]
-            elif (x, y) in portals:
-                row += "🌀"
-            elif y == 0 and x in (3, 4, 5):
-                # 구역 상징 건물
-                sym = {"0": "🏫", "1": "🏛️", "2": "🧸", "3": "🏢", "4": "🏥"}[str(S.zone)]
-                row += sym
-            elif y == 4 and (x == 0 or x == w - 1):
-                row += "🌀"
-            else:
-                row += "🟩" if (x + y) % 2 == 0 else "⬜"
-        rows.append(row)
-    st.markdown('<div class="map-grid">' + "<br>".join(rows) + "</div>", unsafe_allow_html=True)
-    st.caption(f"{z['name']} - {z['desc']} | 🌀 포탈: 맵 가장자리로 이동하면 옆 마을로 이동. 키보드보다 아래 방향 버튼(태블릿용)을 사용하세요.")
-
-def move(dx, dy):
-    z = GD.ZONES[S.zone]
-    nx, ny = S.px + dx, S.py + dy
-    # 포탈 체크
-    if (S.zone, nx, ny) in GD.PORTALS:
-        S.zone = GD.PORTALS[(S.zone, nx, ny)]
-        nz = GD.ZONES[S.zone]
-        S.px, S.py = nz["spawn"][0], nz["spawn"][1]
-        S.talk_npc = None
+def teacher_panel():
+    st.title('교사 대시보드')
+    password=str(config.get('teacher_password',''))
+    if not password or password.startswith('교사용_'):
+        st.warning('Secrets에 안전한 teacher_password를 설정해야 교사 화면을 사용할 수 있습니다.');return
+    if not st.session_state.get('teacher_ok'):
+        if time.time()<st.session_state.get('teacher_wait',0):st.warning('잠시 후 다시 시도해 주세요.');return
+        with st.form('teacher_login'):
+            typed=st.text_input('교사용 비밀번호를 입력하세요.',type='password')
+            submitted=st.form_submit_button('교사 화면에 접속합니다.')
+        if submitted:
+            if hmac.compare_digest(typed,password):st.session_state.teacher_ok=True;st.rerun()
+            else:st.session_state.teacher_wait=time.time()+3;st.error('비밀번호가 맞지 않아요.')
         return
-    if 0 <= nx < z["w"] and 0 <= ny < z["h"]:
-        S.px, S.py = nx, ny
+    c1,c2,c3=st.columns(3)
+    if c1.button('자료를 새로 불러옵니다.'):st.rerun()
+    if c2.button('CSV 백업을 시트로 재전송합니다.'):
+        try:st.success(f'{store.sync()}개 로그를 새로 전송했어요. 엔딩 기록도 확인했어요.')
+        except RuntimeError as e:st.error(str(e))
+    if c3.button('교사 화면에서 로그아웃합니다.'):
+        st.session_state.teacher_ok=False;st.rerun()
+    rows=store.results()
+    if store.error:st.warning(store.error)
+    if not rows:st.info('아직 저장된 엔딩이 없어요. 미완료 학생은 평균에 포함하지 않습니다.');return
+    df=pd.DataFrame(rows)
+    for k in ('contribution','final_tfr','happiness','care','minutes','quiz_correct'):df[k]=pd.to_numeric(df[k],errors='coerce')
+    classes=['전체 반']+sorted(df['class_code'].astype(str).unique().tolist())
+    target=st.selectbox('살펴볼 반을 선택하세요.',classes)
+    if target!='전체 반':df=df[df.class_code.astype(str)==target]
+    st.caption('results 시트와 미전송 엔딩 백업을 사용하며 반+학번별 최신 완료 기록만 집계합니다. 새 게임을 시작했지만 아직 끝내지 않았다면 이전 완료 기록이 남아 있습니다.')
+    c1,c2,c3=st.columns(3);c1.metric('완료 학생 수',len(df));c2.metric('평균 가상 TFR',f'{df.final_tfr.mean():.2f}');c3.metric('평균 TFR 기여도',f'{df.contribution.mean():+.2f}')
+    chart=df.groupby('class_code')['contribution'].mean().rename('평균 TFR 기여도')
+    st.subheader('반별 평균 TFR 기여도를 비교합니다.')
+    st.bar_chart(chart,color='#9ad6b5',height=250)
+    st.caption('게임 규칙에 따른 가상 점수입니다. 개인의 가치·가족의 우열·현실 출산율을 평가하지 않습니다.')
+    display=df.rename(columns={'class_code':'반','student_id':'학번','nickname':'별명','ending':'엔딩','contribution':'기여도','final_tfr':'가상 TFR','happiness':'행복','care':'돌봄 부담','minutes':'경과 시간(분)','quiz_correct':'완료 퀴즈'})
+    st.dataframe(display[['반','학번','별명','엔딩','기여도','가상 TFR','행복','돌봄 부담','경과 시간(분)','완료 퀴즈']],hide_index=True,use_container_width=True)
+    safe_export=display.map(lambda value: "'"+value if isinstance(value,str) and value.startswith(('=','+','-','@','\t','\r')) else value)
+    st.download_button('결과 CSV를 내려받습니다.',safe_export.to_csv(index=False).encode('utf-8-sig'),'수업결과.csv','text/csv')
+    st.info('학생 식별정보가 포함되어 있습니다. 수업 목적 외 공유를 금지하고 학교 개인정보 보유기간에 따라 삭제하세요. 서버 CSV는 Streamlit Cloud 재시작 시 사라질 수 있습니다.')
 
-def nearby_npc():
-    for n in current_npcs():
-        if abs(n["x"] - S.px) + abs(n["y"] - S.py) <= 1:
-            return n
-    return None
-
-# ---------- 로그인 ----------
-if not S.authed:
-    st.title("🏘️ 미래마을을 구해라! 생애설계 어드벤처")
-    st.write("중3(15세)부터 60대까지, 너의 선택이 마을의 합계출산율과 초고령화를 바꾼다. (기술·가정② p.102-103)")
-    st.info("포켓몬 골드+ZEP식 탑다운: 방향 버튼으로 이동 → NPC 옆에서 [말걸기] → 챕터 선택지 결정 → 지표 변화 확인")
-    with st.form("login"):
-        c1, c2, c3 = st.columns(3)
-        sid = c1.text_input("학번 (예: 30101)", max_chars=10)
-        cls = c2.text_input("반 코드 (예: 3-1)", max_chars=10)
-        nick = c3.text_input("닉네임", max_chars=12)
-        col_a, col_b = st.columns(2)
-        new_btn = col_a.form_submit_button("🆕 새로 시작", use_container_width=True)
-        cont_btn = col_b.form_submit_button("📂 이어하기 (학번으로 불러오기)", use_container_width=True)
-        if new_btn or cont_btn:
-            if not sid.strip() or not nick.strip():
-                st.error("학번과 닉네임은 필수입니다.")
-            else:
-                S.student_id, S.class_code, S.nickname = sid.strip(), cls.strip(), nick.strip()
-                if cont_btn:
-                    try:
-                        with st.spinner("구글시트에서 불러오는 중..."):
-                            data = SH.load_progress(S.student_id)
-                    except Exception as e:
-                        st.error(f"불러오기 실패(시트 연결 확인): {e}")
-                        data = None
-                    if data:
-                        S.stats, S.flags, S.history = data["stats"], data["flags"], data["history"]
-                        # 다음 챕터 인덱스 복원
-                        if data["next_chapter"] is None:
-                            S.chapter_idx = len(GD.CHAPTERS)
-                        else:
-                            ids = [c["id"] for c in GD.CHAPTERS]
-                            S.chapter_idx = ids.index(data["next_chapter"])
-                        ch = GD.CHAPTERS[min(S.chapter_idx, len(GD.CHAPTERS) - 1)]
-                        S.zone = ch["zone"]
-                        S.start_time = time.time()
-                        S.authed = True
-                        st.success(f"불러오기 성공! {data['count']}개 기록, {data['next_chapter']}부터 계속.")
-                        st.rerun()
-                    else:
-                        st.warning("해당 학번 기록이 없습니다. 새로 시작합니다.")
-                        S.stats, S.flags, S.history = LG.init_stats(), [], []
-                        S.chapter_idx, S.start_time = 0, time.time()
-                        S.authed = True
-                        st.rerun()
-                else:
-                    S.stats, S.flags, S.history = LG.init_stats(), [], []
-                    S.chapter_idx, S.start_time = 0, time.time()
-                    S.authed = True
-                    st.rerun()
-    st.stop()
-
-# ---------- 메인 ----------
-hud()
-tab_game, tab_quiz, tab_teacher = st.tabs(["🎮 게임", "📝 퀴즈 (6문제)", "👩‍🏫 교사 대시보드"])
-
-with tab_game:
-    left, right = st.columns([1.1, 1.4])
-    with left:
-        st.subheader(f"🗺️ {GD.ZONES[S.zone]['name']}")
-        render_map()
-        m1, m2, m3 = st.columns(3)
-        with m1:
-            st.button("⬆️", use_container_width=True, on_click=move, args=(0, -1))
-        with m2:
-            pass
-        with m3:
-            pass
-        b1, b2, b3, b4 = st.columns(4)
-        b1.button("⬅️", use_container_width=True, on_click=move, args=(-1, 0))
-        b2.button("⬇️", use_container_width=True, on_click=move, args=(0, 1))
-        b3.button("➡️", use_container_width=True, on_click=move, args=(1, 0))
-        b4.button("🌀 포탈", use_container_width=True, help="맵 가장자리 🌀로 가면 자동 이동",
-                  on_click=lambda: None)
-        # 포탈 수동 이동 버튼 (모바일 편의)
-        pz = st.selectbox("포탈 이동", [GD.ZONES[i]["name"] for i in range(5)], index=S.zone)
-        if st.button("해당 마을로 이동"):
-            S.zone = [GD.ZONES[i]["name"] for i in range(5)].index(pz)
-            S.px, S.py = GD.ZONES[S.zone]["spawn"]
-            st.rerun()
-        st.divider()
-        npc = nearby_npc()
-        if npc:
-            st.markdown(f"<div class='talk'><b>{npc['emoji']} {npc['name']}</b><br>{npc['dialogue'].replace(chr(10), '<br>')}<br><i>💡 {npc['hint']}</i></div>", unsafe_allow_html=True)
-        else:
-            st.caption("NPC 옆(상하좌우 1칸)으로 이동하면 대화가 표시됩니다.")
-        st.write("**이 마을 NPC 목록**")
-        for n in current_npcs():
-            st.write(f"{n['emoji']} {n['name']} ({n['x']},{n['y']})")
-
-    with right:
-        # 종료 후 엔딩
-        if S.ended and S.ending:
-            e, final, delta, bonus = S.ending
-            info = GD.ENDING_INFO[e]
-            sign = "+" if delta >= 0 else ""
-            st.markdown(f"<div class='ending-big'>당신의 선택이 합계출산율을 {sign}{delta}만큼 {'올렸습니다' if delta>=0 else '내렸습니다'}!<br>최종 TFR {final:.2f}</div>", unsafe_allow_html=True)
-            st.success(f"{info['title']} ({info['cond']}) — {info['desc']}")
-            st.bar_chart({"나의 TFR": final, "시작값": 1.30, "전국 참고": 0.72})
-            st.write(f"보너스 합계 {bonus:+.2f} | 내 자녀 {S.stats['my_children']}명 | 고령화율 {S.stats['aging']:.1f}% | 플래그: {', '.join(S.flags) if S.flags else '없음'}")
-            st.write("**내 선택 경로:** " + (" → ".join([h['choice_id'] for h in S.history]) if S.history else "-"))
-            if st.button("🔄 처음부터 다시"):
-                for k in ("chapter_idx", "ended", "ending", "quiz_done", "quiz_score", "quiz_idx"):
-                    S[k] = 0 if "idx" in k or "score" in k else (False if isinstance(S[k], bool) else None)
-                S.stats, S.flags, S.history = LG.init_stats(), [], []
-                S.chapter_idx, S.ended, S.ending = 0, False, None
-                S.start_time = time.time()
-                S.zone, S.px, S.py = 0, 4, 7
-                st.rerun()
-        elif S.chapter_idx >= len(GD.CHAPTERS):
-            st.info("모든 챕터를 완료했습니다. 퀴즈 탭을 풀고 아래 버튼으로 엔딩을 확인하세요.")
-            if st.button("🏁 엔딩 확정 + 결과 저장", type="primary", use_container_width=True):
-                e, final, delta, bonus = LG.determine_ending(S.stats, S.flags)
-                S.ending, S.ended = (e, final, delta, bonus), True
-                play_sec = int(time.time() - S.start_time)
-                summary = " → ".join([h["choice_id"] for h in S.history]) + f" | flags:{','.join(S.flags)}"
-                ok, msg = SH.save_result(S.student_id, S.class_code, S.nickname, e, final, delta, S.stats["aging"], play_sec, summary)
-                S.save_msg = msg
-                st.success(msg)
-                st.rerun()
-            if S.save_msg:
-                st.caption(S.save_msg)
-        else:
-            ch = GD.CHAPTERS[S.chapter_idx]
-            # 챕터 구역 자동 안내 (이동 강제 아님)
-            st.subheader(ch["title"])
-            st.write(f"*{ch['age']} · 현재 {S.chapter_idx+1}/{len(GD.CHAPTERS)}*")
-            st.write(ch["story"])
-            if S.zone != ch["zone"]:
-                st.warning(f"이 챕터 추천 마을: {GD.ZONES[ch['zone']]['name']} — 왼쪽 포탈로 이동하면 몰입도가 높아집니다.")
-            for c in ch["choices"]:
-                locked, reason = LG.is_locked(ch["id"], c["cid"], S.flags, S.history)
-                if locked:
-                    st.button(f"🔒 {c['text']} — {reason}", disabled=True, key=c["cid"], use_container_width=True)
-                    continue
-                if st.button(c["text"], key=c["cid"], use_container_width=True):
-                    S.stats = LG.apply_effects(S.stats, c.get("effects", {}))
-                    if "my_children" in c:
-                        S.stats["my_children"] = c["my_children"]
-                    for f in c.get("flags", []):
-                        if f not in S.flags:
-                            S.flags.append(f)
-                    S.history.append({"chapter": ch["id"], "choice_id": c["cid"], "choice_text": c["text"]})
-                    final, delta, _ = LG.calc_tfr(S.stats, S.flags)
-                    ok, msg = SH.save_choice(S.student_id, S.class_code, S.nickname, ch["id"], c["cid"], c["text"], S.stats, delta)
-                    S.save_msg = msg
-                    st.toast(f"{c['feedback']} ({msg})")
-                    # 다음 챕터로
-                    S.chapter_idx += 1
-                    if S.chapter_idx < len(GD.CHAPTERS):
-                        S.zone = GD.CHAPTERS[S.chapter_idx]["zone"]
-                        S.px, S.py = GD.ZONES[S.zone]["spawn"]
-                    st.rerun()
-            if S.save_msg:
-                st.caption(f"💾 {S.save_msg}")
-            st.divider()
-            st.write("**진행 기록**")
-            for h in S.history:
-                st.write(f"- {h['chapter']}: {h['choice_text']}")
-
-with tab_quiz:
-    st.subheader("📝 교과서 퀴즈 6문제 (맞히면 TFR 보너스 +0.02/문제)")
-    if S.quiz_done:
-        st.success(f"완료! 점수 {S.quiz_score}/6 — 보너스 {S.stats.get('quiz_bonus',0):+.2f}가 최종 TFR에 반영됩니다.")
-        if st.button("퀴즈 다시 풀기"):
-            S.quiz_idx, S.quiz_score, S.quiz_done = 0, 0, False
-            S.stats["quiz_bonus"] = 0
-            st.rerun()
-    else:
-        q = GD.QUIZZES[S.quiz_idx]
-        st.write(f"**Q{S.quiz_idx+1}. {q['q']}**")
-        for i, o in enumerate(q["opts"]):
-            if st.button(o, key=f"q{S.quiz_idx}_{i}", use_container_width=True):
-                if i == q["answer"]:
-                    st.success(f"정답! {q['explain']}")
-                    S.quiz_score += 1
-                    S.stats["quiz_bonus"] = round(S.stats.get("quiz_bonus", 0) + 0.02, 2)
-                else:
-                    st.error(f"오답. {q['explain']}")
-                S.quiz_idx += 1
-                if S.quiz_idx >= len(GD.QUIZZES):
-                    S.quiz_done = True
-                st.rerun()
-
-with tab_teacher:
-    st.subheader("👩‍🏫 교사 대시보드 (results 시트)")
-    st.caption("results 워크시트의 반별 평균 TFR 기여도를 보여줍니다. 시트 연결 실패 시 빈 화면.")
-    try:
-        df = SH.read_results_df()
-        if df.empty:
-            st.info("아직 저장된 결과가 없습니다. 학생들이 엔딩까지 완료하면 표시됩니다.")
-        else:
-            st.dataframe(df.tail(50), use_container_width=True)
-            if "tfr_delta" in df.columns and "class_code" in df.columns:
-                import pandas as pd
-                df["tfr_delta"] = pd.to_numeric(df["tfr_delta"], errors="coerce")
-                st.bar_chart(df.groupby("class_code")["tfr_delta"].mean())
-            if "ending_type" in df.columns:
-                st.bar_chart(df["ending_type"].value_counts())
-    except Exception as e:
-        st.error(f"시트 읽기 실패: {e}")
-
-# 사이드바
 with st.sidebar:
-    st.write("💾 저장 상태")
-    st.write(S.save_msg or "아직 저장 전")
-    if st.button("로그아웃"):
-        S.authed = False
+    st.header('미래마을 수업실')
+    mode=st.radio('화면을 선택하세요.',['학생 게임','교사 대시보드'])
+    st.caption(SOURCE)
+    st.caption('제작: 수업용 원본 픽셀 RPG입니다. 외부 게임 이미지나 소리를 사용하지 않습니다.')
+if mode=='교사 대시보드':teacher_panel();st.stop()
+st.title(TITLE)
+st.caption(SUBTITLE+' · 중3 15세 → 65세 · 15~20분')
+if 'state' not in st.session_state:
+    st.info('학번·반·별명을 입력해 시작해요. 이어하기에는 동일한 반·학번과 본인이 정한 저장 비밀번호가 필요합니다.')
+    with st.expander('수업 모형과 개인정보 안내를 읽습니다.',expanded=True):st.write(NOTICE);st.write('실명은 입력하지 마세요. 입력 정보와 선택 기록은 교사의 수업용 시트에 저장됩니다. 저장 비밀번호는 해시값으로만 보관됩니다.')
+    with st.form('start'):
+        c1,c2,c3=st.columns(3)
+        sid=c1.text_input('학번을 입력하세요. (숫자·영문·하이픈)',max_chars=20)
+        cls=c2.text_input('반 코드를 입력하세요. (예: 3-2)',max_chars=20)
+        nick=c3.text_input('별명을 입력하세요.',max_chars=12)
+        pin=st.text_input('본인 저장 비밀번호를 입력하세요. (4~32자)',type='password',max_chars=32)
+        confirmed=st.checkbox('새로 시작하면 이전 진행 대신 새 기록을 최신 기록으로 사용한다는 점을 확인했습니다.')
+        a,b=st.columns(2);resume=a.form_submit_button('이어하기');fresh=b.form_submit_button('새로시작')
+    if resume or fresh:
+        sid,cls,nick=sid.strip(),cls.strip(),nick.strip()
+        if not re.fullmatch(r'[A-Za-z0-9-]{1,20}',sid) or not re.fullmatch(r'[A-Za-z0-9가-힣_-]{1,20}',cls) or not nick or len(pin)<4:
+            st.error('학번·반·별명과 4자 이상의 비밀번호를 확인해 주세요.')
+        elif time.time()<st.session_state.get('login_wait',0):st.warning('잠시 후 다시 시도해 주세요.')
+        else:
+            try:
+                old=store.latest(sid,cls)
+                if old and not verify_pin(old,pin):
+                    st.session_state.login_wait=time.time()+3;st.error('기존 기록의 저장 비밀번호가 맞지 않아요. 교사에게 문의하세요.')
+                elif resume:
+                    if old:enter(old,'이어하기')
+                    else:st.warning('일치하는 최신 기록을 찾지 못했어요. Google 연결을 확인하거나 개인 저장파일을 복원해 주세요.')
+                elif not confirmed:st.warning('새로시작 확인란을 선택해 주세요.')
+                else:enter(new_state(sid,cls,nick,pin),'새로시작')
+            except (ValueError,KeyError,TypeError):st.error('기존 저장 기록의 형식이 올바르지 않아요. 교사에게 문의하세요.')
+            if store.error:st.warning(store.error)
+    with st.expander('개인 저장파일에서 복원합니다.'):
+        upload=st.file_uploader('본인의 미래마을 JSON 저장파일을 선택하세요.',type=['json'])
+        filepin=st.text_input('파일의 저장 비밀번호를 입력하세요.',type='password',key='file_pin')
+        if st.button('저장파일을 복원합니다.'):
+            try:
+                if upload is None:raise ValueError('파일을 먼저 선택해 주세요.')
+                if upload.size>1_000_000:raise ValueError('파일이 너무 커요.')
+                restored=validate_state(json.loads(upload.getvalue()))
+                if not verify_pin(restored,filepin):raise ValueError('저장 비밀번호가 맞지 않아요.')
+                restored['revision']+=1;enter(restored,'파일복원')
+            except (ValueError,KeyError,TypeError,UnicodeError) as e:st.error(str(e))
+    st.caption('키 설정 없이도 체험할 수 있지만 로컬 CSV는 영구 저장소가 아닙니다. 정규 수업에서는 Google Sheets 연결을 권장합니다.')
+    st.stop()
+s=st.session_state.state
+payload={'state':public_state(s),'maps':MAPS,'npcs':NPCS,'chapters':CHAPTERS,'notice':NOTICE,'ui':st.session_state.get('ui'),'save_status':st.session_state.get('save_status','')}
+event=game(payload,key='village_'+s['run_id'])
+if isinstance(event,dict) and event.get('id') and event['id']!=st.session_state.get('last_event'):
+    st.session_state.last_event=event['id']
+    try:
+        updated,ui=handle(s,event);sync_state(updated);st.session_state.ui=ui
+        st.session_state.save_status=store.save(updated,event.get('kind','진행'))
+    except (ValueError,KeyError,TypeError,IndexError) as e:
+        updated=copy.deepcopy(s);updated['revision']+=1;sync_state(updated)
+        st.session_state.ui={'type':'notice','title':'한 번 더 확인해 주세요.','text':str(e)}
+    st.rerun()
+status=st.session_state.get('save_status','')
+if '백업' in status or '실패' in status or '오류' in status:st.warning(status)
+else:st.caption(status)
+c1,c2,c3=st.columns(3)
+raw=json.dumps(st.session_state.state,ensure_ascii=False,indent=2).encode('utf-8')
+c1.download_button('개인 저장파일을 내려받습니다.',raw,'미래마을_'+s['class_code']+'_'+s['student_id']+'.json','application/json')
+if c2.button('현재 진행을 저장합니다.'):
+    st.session_state.save_status=store.save(s,'수동저장');st.rerun()
+if c3.button('저장하고 시작화면으로 돌아갑니다.'):
+    message=store.save(s,'나가기')
+    if '로컬 파일 쓰기도 실패' in message:st.error(message)
+    else:
+        for key in ['state','ui','last_event','student_id','class_code','nickname','x','y','chapter','flags','stats','start_time']:st.session_state.pop(key,None)
         st.rerun()
+with st.expander('선택 기록과 경제 상황을 확인합니다.'):
+    st.write(f"현재 월 주거비는 {s['stats']['housing']}만원, 개인 월 소득은 {s['stats']['income']}만원입니다. 실제 가계 계산이 아닌 수업용 설정입니다.")
+    for h in s['history']:st.write(f"{h['age']}세: {h['label']}");st.caption(' '.join(h['extra']))
+    st.caption('이동은 화면 내부에서 즉시 처리되며, 25초 주기 또는 대화·선택·포탈 이동·저장 버튼에서 서버에 반영됩니다. 브라우저를 닫기 전에 저장하세요.')
+if s['finished']:
+    d,t=score(s)
+    st.subheader('나의 엔딩을 수업 기록으로 남깁니다.')
+    st.write(public_state(s)['ending_info']['message'])
+    st.bar_chart(pd.DataFrame({'가상 TFR':[1.30,t]},index=['전국 비교 기준(가정)','나의 가상 결과']),height=230,color='#9ad6b5')
+    st.caption('전국 기준 1.30은 수업용 가정값입니다. 음수 결과는 고정 계산식의 한계이며 실제 출산율이 아닙니다.')
+    st.write('어떤 정책이 행복과 돌봄 부담을 함께 바꾸었나요? 자녀 수를 바꾸지 않고도 더 나은 삶을 만드는 방법은 무엇인가요?')
+    report={'반':s['class_code'],'학번':s['student_id'],'별명':s['nickname'],'엔딩':s['ending'],'TFR 기여도':d,'최종 가상 TFR':t,'선택 기록':s['history']}
+    st.download_button('나의 결과 기록을 내려받습니다.',json.dumps(report,ensure_ascii=False,indent=2),'미래마을_결과.json','application/json')

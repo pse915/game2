@@ -52,7 +52,7 @@ def valid_pin(pin,hashinfo):
 def normalize(v):return v.strip()
 
 def login():
-    st.title('🌅 세월항: 내일을 잇는 마을')
+    st.title('🌅 황성마을 : 내일을 잇는 마을')
     st.caption('서라벌여중 · 기술·가정 102~103쪽 · 나만의 생애설계 픽셀 어드벤처')
     st.markdown('**이곳에서 당신의 삶과 마을의 미래는 서로 영향을 주고받습니다.** 마을을 걸으며 주민의 사건을 발견하고, 생애 단계마다 선택을 만들어 보세요.')
     if store_problem:st.error(store_problem+' · 관리자에게 문의하세요. 설정된 Google Sheets가 있을 때 임의로 다른 저장소로 넘어가지 않습니다.')
@@ -88,7 +88,7 @@ def login():
 
 def world():
     state=st.session_state['world_state']
-    st.markdown(f"<span style='font-size:1.35rem;font-weight:800'>🌅 세월항 <span style='color:#9bcfc0;font-size:.85rem'>내일을 잇는 마을 · {state['nickname']}의 이야기</span></span>",unsafe_allow_html=True)
+    st.markdown(f"<span style='font-size:1.35rem;font-weight:800'>🌅 황성마을 <span style='color:#9bcfc0;font-size:.85rem'>생애설계 체험하기 · {state['nickname']}의 이야기</span></span>",unsafe_allow_html=True)
     with st.sidebar:
         st.subheader('나의 생애 일지')
         st.write(f"**{state['age']}세 · {['청년기','성인기','노년기'][state['stage']]}**")

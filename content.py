@@ -143,7 +143,7 @@ ZONES = [
 
 BUILDINGS = {
  "shop":[[3,3,6,5,"베이커리","bread"],[12,2,7,6,"노을카페","cafe"],[22,3,5,5,"빈 점포","closed"]],
- "square":[[3,3,6,5,"서라벌여중","school"],[12,2,7,5,"마을회관","hall"],[23,3,5,5,"도서관","library"]],
+ "square":[[2,1,10,7,"서라벌여중","school"],[12,2,7,5,"마을회관","hall"],[23,3,5,5,"도서관","library"]],
  "work":[[3,3,7,5,"창업공방","factory"],[14,2,7,6,"직업교육소","school"],[24,3,4,5,"공유사무실","office"]],
  "home":[[3,3,6,5,"공동주거","home"],[13,2,7,6,"임대주택","house"],[23,3,5,5,"작은 집","home"]],
  "welfare":[[3,3,7,5,"마을 보건소","clinic"],[13,2,7,6,"돌봄센터","care"],[23,3,5,5,"어린이집","school"]],
@@ -151,5 +151,6 @@ BUILDINGS = {
 }
 
 def public_content():
+    from school import school_content
     return {"stages": STAGES, "concepts": CONCEPTS, "npcs": NPCS,
-            "events": EVENTS, "requirements": REQUIRED, "zones": ZONES, "buildings": BUILDINGS}
+            "events": EVENTS, "requirements": REQUIRED, "zones": ZONES, "buildings": BUILDINGS, "school": school_content()}

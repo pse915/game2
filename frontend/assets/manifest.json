@@ -1,0 +1,334 @@
+{
+  "tile_size": 32,
+  "assets": {
+    "school_exterior": {
+      "file": "assets/school_exterior.png",
+      "width": 320,
+      "height": 224,
+      "purpose": "Pixel art depiction of long red-brick school facade, glass windows, canopy and green fence",
+      "source": "Original pixel-art; reference: user-provided exterior photo; not reproduced",
+      "license": "Project-generated",
+      "pixel_scale": 2
+    },
+    "school_hall_1": {
+      "file": "assets/school_hall_1.png",
+      "width": 960,
+      "height": 608,
+      "purpose": "School hallway background, floor 1",
+      "source": "Original pixel-art; reference: user-provided exterior photo; not reproduced",
+      "license": "Project-generated",
+      "pixel_scale": 2
+    },
+    "school_hall_2": {
+      "file": "assets/school_hall_2.png",
+      "width": 960,
+      "height": 608,
+      "purpose": "School hallway background, floor 2",
+      "source": "Original pixel-art; reference: user-provided exterior photo; not reproduced",
+      "license": "Project-generated",
+      "pixel_scale": 2
+    },
+    "school_hall_3": {
+      "file": "assets/school_hall_3.png",
+      "width": 960,
+      "height": 608,
+      "purpose": "School hallway background, floor 3",
+      "source": "Original pixel-art; reference: user-provided exterior photo; not reproduced",
+      "license": "Project-generated",
+      "pixel_scale": 2
+    },
+    "school_hall_4": {
+      "file": "assets/school_hall_4.png",
+      "width": 960,
+      "height": 608,
+      "purpose": "School hallway background, floor 4",
+      "source": "Original pixel-art; reference: user-provided exterior photo; not reproduced",
+      "license": "Project-generated",
+      "pixel_scale": 2
+    },
+    "school_classroom": {
+      "file": "assets/school_classroom.png",
+      "width": 960,
+      "height": 608,
+      "purpose": "Shared classroom art with windows, chalkboard, desks, bookcases",
+      "source": "Original pixel-art; reference: user-provided exterior photo; not reproduced",
+      "license": "Project-generated",
+      "pixel_scale": 2
+    },
+    "teacher_00": {
+      "file": "assets/teacher_00.png",
+      "width": 128,
+      "height": 192,
+      "purpose": "Original teacher sprite 0, 4 directions x 4 walking frames",
+      "source": "Original pixel-art; reference: user-provided exterior photo; not reproduced",
+      "license": "Project-generated",
+      "pixel_scale": 2
+    },
+    "teacher_01": {
+      "file": "assets/teacher_01.png",
+      "width": 128,
+      "height": 192,
+      "purpose": "Original teacher sprite 1, 4 directions x 4 walking frames",
+      "source": "Original pixel-art; reference: user-provided exterior photo; not reproduced",
+      "license": "Project-generated",
+      "pixel_scale": 2
+    },
+    "teacher_02": {
+      "file": "assets/teacher_02.png",
+      "width": 128,
+      "height": 192,
+      "purpose": "Original teacher sprite 2, 4 directions x 4 walking frames",
+      "source": "Original pixel-art; reference: user-provided exterior photo; not reproduced",
+      "license": "Project-generated",
+      "pixel_scale": 2
+    },
+    "teacher_03": {
+      "file": "assets/teacher_03.png",
+      "width": 128,
+      "height": 192,
+      "purpose": "Original teacher sprite 3, 4 directions x 4 walking frames",
+      "source": "Original pixel-art; reference: user-provided exterior photo; not reproduced",
+      "license": "Project-generated",
+      "pixel_scale": 2
+    },
+    "teacher_04": {
+      "file": "assets/teacher_04.png",
+      "width": 128,
+      "height": 192,
+      "purpose": "Original teacher sprite 4, 4 directions x 4 walking frames",
+      "source": "Original pixel-art; reference: user-provided exterior photo; not reproduced",
+      "license": "Project-generated",
+      "pixel_scale": 2
+    },
+    "teacher_05": {
+      "file": "assets/teacher_05.png",
+      "width": 128,
+      "height": 192,
+      "purpose": "Original teacher sprite 5, 4 directions x 4 walking frames",
+      "source": "Original pixel-art; reference: user-provided exterior photo; not reproduced",
+      "license": "Project-generated",
+      "pixel_scale": 2
+    },
+    "teacher_06": {
+      "file": "assets/teacher_06.png",
+      "width": 128,
+      "height": 192,
+      "purpose": "Original teacher sprite 6, 4 directions x 4 walking frames",
+      "source": "Original pixel-art; reference: user-provided exterior photo; not reproduced",
+      "license": "Project-generated",
+      "pixel_scale": 2
+    },
+    "teacher_07": {
+      "file": "assets/teacher_07.png",
+      "width": 128,
+      "height": 192,
+      "purpose": "Original teacher sprite 7, 4 directions x 4 walking frames",
+      "source": "Original pixel-art; reference: user-provided exterior photo; not reproduced",
+      "license": "Project-generated",
+      "pixel_scale": 2
+    },
+    "teacher_08": {
+      "file": "assets/teacher_08.png",
+      "width": 128,
+      "height": 192,
+      "purpose": "Original teacher sprite 8, 4 directions x 4 walking frames",
+      "source": "Original pixel-art; reference: user-provided exterior photo; not reproduced",
+      "license": "Project-generated",
+      "pixel_scale": 2
+    },
+    "teacher_09": {
+      "file": "assets/teacher_09.png",
+      "width": 128,
+      "height": 192,
+      "purpose": "Original teacher sprite 9, 4 directions x 4 walking frames",
+      "source": "Original pixel-art; reference: user-provided exterior photo; not reproduced",
+      "license": "Project-generated",
+      "pixel_scale": 2
+    },
+    "teacher_10": {
+      "file": "assets/teacher_10.png",
+      "width": 128,
+      "height": 192,
+      "purpose": "Original teacher sprite 10, 4 directions x 4 walking frames",
+      "source": "Original pixel-art; reference: user-provided exterior photo; not reproduced",
+      "license": "Project-generated",
+      "pixel_scale": 2
+    },
+    "teacher_11": {
+      "file": "assets/teacher_11.png",
+      "width": 128,
+      "height": 192,
+      "purpose": "Original teacher sprite 11, 4 directions x 4 walking frames",
+      "source": "Original pixel-art; reference: user-provided exterior photo; not reproduced",
+      "license": "Project-generated",
+      "pixel_scale": 2
+    },
+    "teacher_12": {
+      "file": "assets/teacher_12.png",
+      "width": 128,
+      "height": 192,
+      "purpose": "Original teacher sprite 12, 4 directions x 4 walking frames",
+      "source": "Original pixel-art; reference: user-provided exterior photo; not reproduced",
+      "license": "Project-generated",
+      "pixel_scale": 2
+    },
+    "teacher_13": {
+      "file": "assets/teacher_13.png",
+      "width": 128,
+      "height": 192,
+      "purpose": "Original teacher sprite 13, 4 directions x 4 walking frames",
+      "source": "Original pixel-art; reference: user-provided exterior photo; not reproduced",
+      "license": "Project-generated",
+      "pixel_scale": 2
+    },
+    "teacher_14": {
+      "file": "assets/teacher_14.png",
+      "width": 128,
+      "height": 192,
+      "purpose": "Original teacher sprite 14, 4 directions x 4 walking frames",
+      "source": "Original pixel-art; reference: user-provided exterior photo; not reproduced",
+      "license": "Project-generated",
+      "pixel_scale": 2
+    },
+    "teacher_15": {
+      "file": "assets/teacher_15.png",
+      "width": 128,
+      "height": 192,
+      "purpose": "Original teacher sprite 15, 4 directions x 4 walking frames",
+      "source": "Original pixel-art; reference: user-provided exterior photo; not reproduced",
+      "license": "Project-generated",
+      "pixel_scale": 2
+    },
+    "teacher_16": {
+      "file": "assets/teacher_16.png",
+      "width": 128,
+      "height": 192,
+      "purpose": "Original teacher sprite 16, 4 directions x 4 walking frames",
+      "source": "Original pixel-art; reference: user-provided exterior photo; not reproduced",
+      "license": "Project-generated",
+      "pixel_scale": 2
+    },
+    "teacher_17": {
+      "file": "assets/teacher_17.png",
+      "width": 128,
+      "height": 192,
+      "purpose": "Original teacher sprite 17, 4 directions x 4 walking frames",
+      "source": "Original pixel-art; reference: user-provided exterior photo; not reproduced",
+      "license": "Project-generated",
+      "pixel_scale": 2
+    },
+    "teacher_18": {
+      "file": "assets/teacher_18.png",
+      "width": 128,
+      "height": 192,
+      "purpose": "Original teacher sprite 18, 4 directions x 4 walking frames",
+      "source": "Original pixel-art; reference: user-provided exterior photo; not reproduced",
+      "license": "Project-generated",
+      "pixel_scale": 2
+    },
+    "interior_bread": {
+      "file": "assets/interior_bread.png",
+      "width": 960,
+      "height": 608,
+      "purpose": "빵집 bespoke interior background",
+      "source": "Original Python-generated pixel art",
+      "license": "Project-generated"
+    },
+    "interior_cafe": {
+      "file": "assets/interior_cafe.png",
+      "width": 960,
+      "height": 608,
+      "purpose": "카페 bespoke interior background",
+      "source": "Original Python-generated pixel art",
+      "license": "Project-generated"
+    },
+    "interior_closed": {
+      "file": "assets/interior_closed.png",
+      "width": 960,
+      "height": 608,
+      "purpose": "새로운 공간 bespoke interior background",
+      "source": "Original Python-generated pixel art",
+      "license": "Project-generated"
+    },
+    "interior_hall": {
+      "file": "assets/interior_hall.png",
+      "width": 960,
+      "height": 608,
+      "purpose": "마을회관 bespoke interior background",
+      "source": "Original Python-generated pixel art",
+      "license": "Project-generated"
+    },
+    "interior_library": {
+      "file": "assets/interior_library.png",
+      "width": 960,
+      "height": 608,
+      "purpose": "도서관 bespoke interior background",
+      "source": "Original Python-generated pixel art",
+      "license": "Project-generated"
+    },
+    "interior_factory": {
+      "file": "assets/interior_factory.png",
+      "width": 960,
+      "height": 608,
+      "purpose": "공방 bespoke interior background",
+      "source": "Original Python-generated pixel art",
+      "license": "Project-generated"
+    },
+    "interior_office": {
+      "file": "assets/interior_office.png",
+      "width": 960,
+      "height": 608,
+      "purpose": "사무실 bespoke interior background",
+      "source": "Original Python-generated pixel art",
+      "license": "Project-generated"
+    },
+    "interior_home": {
+      "file": "assets/interior_home.png",
+      "width": 960,
+      "height": 608,
+      "purpose": "공동주거 bespoke interior background",
+      "source": "Original Python-generated pixel art",
+      "license": "Project-generated"
+    },
+    "interior_house": {
+      "file": "assets/interior_house.png",
+      "width": 960,
+      "height": 608,
+      "purpose": "주거공간 bespoke interior background",
+      "source": "Original Python-generated pixel art",
+      "license": "Project-generated"
+    },
+    "interior_clinic": {
+      "file": "assets/interior_clinic.png",
+      "width": 960,
+      "height": 608,
+      "purpose": "보건시설 bespoke interior background",
+      "source": "Original Python-generated pixel art",
+      "license": "Project-generated"
+    },
+    "interior_care": {
+      "file": "assets/interior_care.png",
+      "width": 960,
+      "height": 608,
+      "purpose": "돌봄공간 bespoke interior background",
+      "source": "Original Python-generated pixel art",
+      "license": "Project-generated"
+    },
+    "interior_school": {
+      "file": "assets/interior_school.png",
+      "width": 960,
+      "height": 608,
+      "purpose": "배움공간 bespoke interior background",
+      "source": "Original Python-generated pixel art",
+      "license": "Project-generated"
+    },
+    "interior_theater": {
+      "file": "assets/interior_theater.png",
+      "width": 960,
+      "height": 608,
+      "purpose": "작은 극장 bespoke interior background",
+      "source": "Original Python-generated pixel art",
+      "license": "Project-generated"
+    }
+  }
+}

@@ -5,7 +5,8 @@ from __future__ import annotations
 from copy import deepcopy
 from datetime import datetime, timezone
 import uuid
-from content import EVENTS, REQUIRED, CONCEPTS, STAGES
+from content import EVENTS, REQUIRED, CONCEPTS, STAGES, BUILDINGS
+from school import validate_school_interaction, concept_for, TEACHER_MAP, SPECIAL, OBJECT_LABELS
 
 SCHEMA = 1
 LIMITS = {"money":(-6,16), "time":(-6,16), "energy":(-6,16), "bond":(-6,16), "insight":(0,40)}
@@ -14,9 +15,9 @@ def new_state(class_code: str, student_id: str, nickname: str, appearance: int =
     return {"schema":SCHEMA, "run_id":uuid.uuid4().hex, "revision":0,
             "class_code":class_code,"student_id":student_id,"nickname":nickname,
             "appearance":int(appearance)%6, "stage":0,"age":19,"zone":"square",
-            "x":16,"y":13,"flags":{},"decisions":{},"concepts":[],
+            "x":7,"y":9,"flags":{},"decisions":{},"concepts":[],
             "stats":{"money":5,"time":5,"energy":5,"bond":5,"insight":0},
-            "journal":[],"nonces":[],"ended":False,"reflection":"",
+            "journal":[],"school_records":{},"building_records":{},"guide_mode":"basic","nonces":[],"ended":False,"reflection":"",
             "started_at":datetime.now(timezone.utc).isoformat(),"last_update":datetime.now(timezone.utc).isoformat()}
 
 def completed(state:dict)->list[str]:
@@ -67,6 +68,44 @@ def apply(state:dict, message:dict) -> tuple[dict,str]:
         result['concepts']=list(dict.fromkeys(result['concepts']+data['concepts']))
         result['journal'].append({"age":result['age'],"event":key,"title":event['title'],"choice":data['label'],"outcome":data['text']})
         feedback=data['text']
+    elif kind=='school_activity':
+        room = str(message.get('room_id',''))
+        obj = str(message.get('object_id',''))
+        choice = str(message.get('choice_id',''))
+        if not validate_school_interaction(room, obj, choice):
+            return result,'유효하지 않은 교실 활동입니다.'
+        record_key = room+':'+obj
+        if record_key in result.get('school_records',{}):
+            return result,'이미 기록한 학교 활동입니다.'
+        title=(TEACHER_MAP[room]['homeroom']+' 교실') if room in TEACHER_MAP else SPECIAL[room][0]
+        result.setdefault('school_records',{})[record_key]={'choice':choice,'title':title,'object':OBJECT_LABELS[obj]}
+        result['concepts']=list(dict.fromkeys(result['concepts']+[concept_for(room)]))
+        feedback=title+'의 '+OBJECT_LABELS[obj]+' 활동이 미래 다이어리에 기록되었습니다.'
+    elif kind=='building_activity':
+        # Validate a building ID against actual map data, not a browser-supplied label.
+        room = str(message.get('building_id',''))
+        obj = str(message.get('object_id',''))
+        choice = str(message.get('choice_id',''))
+        known = {f'{zone}:{b[0]}:{b[1]}':b for zone,blocks in BUILDINGS.items() for b in blocks}
+        building=known.get(room)
+        if not building or obj not in ('notice','work','reflection') or choice not in ('observe','help'):
+            return result,'유효하지 않은 건물 활동입니다.'
+        key=room+':'+obj
+        if key in result.get('building_records',{}):
+            return result,'이미 경험한 공간 활동입니다.'
+        concepts={'cafe':'labor','bread':'labor','factory':'employment','office':'workcare',
+                  'home':'housing','house':'housing','hall':'policy','library':'generations',
+                  'school':'education_cost','clinic':'ret_health','care':'elder_care',
+                  'theater':'ret_leisure','closed':'housing'}
+        result.setdefault('building_records',{})[key]={'choice':choice,'building':building[4], 'activity':obj}
+        concept=concepts.get(building[5],'values')
+        result['concepts']=list(dict.fromkeys(result['concepts']+[concept]))
+        feedback=f'{building[4]}에서 탐험한 내용이 미래 다이어리에 기록되었습니다.'
+    elif kind=='guide_setting':
+        mode=str(message.get('mode',''))
+        if mode not in ('friendly','basic','free'):return result,'유효하지 않은 안내 설정입니다.'
+        result['guide_mode']=mode
+        feedback={'friendly':'친절한 길 안내로 변경했습니다.','basic':'기본 길 안내로 변경했습니다.','free':'자유 탐험 모드로 변경했습니다.'}[mode]
     elif kind=='advance':
         if result['ended']:return result,"이미 생애설계를 정리했습니다."
         if not ready(result):return result,"다음 시기로 가기 전에 필요한 사건을 경험해 보세요."

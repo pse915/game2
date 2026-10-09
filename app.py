@@ -9,7 +9,7 @@ from content import public_content, REQUIRED, CONCEPTS
 from engine import SCHEMA, new_state, apply, recap, ready
 from storage import make_store, StorageError
 
-st.set_page_config(page_title='황성마을 | 서라벌여중 생애설계',page_icon='🌅',layout='wide',initial_sidebar_state='collapsed')
+st.set_page_config(page_title='서라벌여중 | 나의 미래 다이어리',page_icon='🌅',layout='wide',initial_sidebar_state='collapsed')
 st.markdown('''<style>
 .stApp{background:#101b26;color:#e7f1ea} .block-container{padding-top:.8rem;max-width:1500px}
 [data-testid="stSidebar"]{background:#172737} h1,h2,h3{letter-spacing:-.035em}
@@ -52,9 +52,9 @@ def valid_pin(pin,hashinfo):
 def normalize(v):return v.strip()
 
 def login():
-    st.title('🌅 황성마을 : 내일을 잇는 마을')
+    st.title('📔 서라벌여중: 나의 미래 다이어리')
     st.caption('서라벌여중 · 기술·가정 102~103쪽 · 나만의 생애설계 픽셀 어드벤처')
-    st.markdown('**이곳에서 당신의 삶과 마을의 미래는 서로 영향을 주고받습니다.** 마을을 걸으며 주민의 사건을 발견하고, 생애 단계마다 선택을 만들어 보세요.')
+    st.markdown('**학교 정문에서 시작해 미래마을로 떠나는 자유로운 픽셀 RPG입니다.** 실제 학교를 참고한 외관과 교실에서 탐험을 시작하고, 마을에서는 직업·주거·돌봄·노후를 설계해 보세요.')
     if store_problem:st.error(store_problem+' · 관리자에게 문의하세요. 설정된 Google Sheets가 있을 때 임의로 다른 저장소로 넘어가지 않습니다.')
     with st.form('login-form'):
         a,b,c=st.columns([1,1,1])
@@ -88,7 +88,7 @@ def login():
 
 def world():
     state=st.session_state['world_state']
-    st.markdown(f"<span style='font-size:1.35rem;font-weight:800'>🌅 황성마을 <span style='color:#9bcfc0;font-size:.85rem'>생애설계 체험하기 · {state['nickname']}의 이야기</span></span>",unsafe_allow_html=True)
+    st.markdown(f"<span style='font-size:1.35rem;font-weight:800'>📔 서라벌여중 <span style='color:#9bcfc0;font-size:.85rem'>내일을 잇는 마을 · {state['nickname']}의 이야기</span></span>",unsafe_allow_html=True)
     with st.sidebar:
         st.subheader('나의 생애 일지')
         st.write(f"**{state['age']}세 · {['청년기','성인기','노년기'][state['stage']]}**")

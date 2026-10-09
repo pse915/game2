@@ -1,0 +1,29 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover"><meta name="theme-color" content="#132530"><title>세월항 · 내일을 잇는 마을</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<div id="app" class="game-shell">
+  <header class="topline">
+    <div class="brand"><div class="brand-emblem">✦</div><div><span class="brand-title">세월항 <small>내일을 잇는 마을</small></span><div class="brand-sub">서라벌여중 · 생애설계 픽셀 어드벤처</div></div></div>
+    <div class="status"><span id="stage-pill" class="glass-pill">✧ 청년기</span><span id="age-pill" class="glass-pill">19세</span><span id="stat-pill" class="glass-pill">✦ 인연 5</span><button id="audio-toggle" aria-label="효과음 켜기/끄기">♪ 꺼짐</button></div>
+  </header>
+  <div class="worldline"><div id="zone-label"><span class="mini-sun">☀</span> 별빛 중앙광장</div><div id="world-hint">지도에서 주민을 찾아 <kbd>Space</kbd> 또는 <kbd>Enter</kbd>로 대화하세요</div></div>
+  <main class="layout">
+    <section class="world-frame" aria-label="픽셀 RPG 마을 화면">
+      <div class="viewport">
+        <canvas id="game" width="960" height="608" tabindex="0" aria-label="방향키나 화면 방향패드로 캐릭터를 움직이며 주민과 상호작용하는 마을"></canvas>
+        <div class="screen-corners"><span id="ambient-label">☀ 맑은 오후</span><span>SEWOL PORT · <span id="season">봄</span></span></div>
+        <div id="toast" class="toast hidden" role="status"></div>
+        <div id="modal-layer" class="modal-layer hidden" role="dialog" aria-modal="true"><div id="modal-content" class="dialog"></div></div>
+        <div class="touch-actions"><div id="dpad" class="dpad"><button aria-label="위로 이동" data-dir="up" class="up">▲</button><button aria-label="왼쪽 이동" data-dir="left" class="left">◀</button><button aria-label="아래로 이동" data-dir="down" class="down">▼</button><button aria-label="오른쪽 이동" data-dir="right" class="right">▶</button></div><div class="touch-right"><button id="touch-talk" class="touch-talk">말 걸기 <span>✦</span></button><button id="touch-map" class="touch-mini">지도</button></div></div>
+      </div>
+      <div class="quick-controls"><span>이동 <b>↑ ← ↓ → / WASD</b></span><span>말 걸기 <b>Space / Enter</b></span><span>지도 <b>M</b></span><span>기록 <b>J</b></span><span>건물 <b>문 앞에서 Enter</b></span></div>
+    </section>
+    <aside class="sidebar">
+      <div class="panel quest-panel"><div class="eyebrow">YOUR LIFE JOURNEY <span>✧</span></div><h2 id="task-title">내 삶의 첫 장</h2><p id="task-desc">다양한 주민을 만나 나만의 선택을 만들어보세요.</p><div class="progress"><div id="progress-bar" class="progress-bar"></div></div><div class="progress-foot"><span id="req-count">0 / 2 필수 사건</span><span id="learn-count">학습 단서 0개</span></div><button id="next-stage" class="primary-action" disabled>다음 생애로 이동하기 <span>↗</span></button></div>
+      <div class="panel guide-panel"><div class="section-head"><div><div class="eyebrow">A LIVING VILLAGE</div><h3>마을 지도</h3></div><button id="map-open" class="simple-link">크게 보기 ↗</button></div><div id="mini-map" class="mini-map"></div><p id="zone-subtitle" class="supporting">어디든 자유롭게 탐험하세요.</p></div>
+      <div class="panel memory-panel"><div class="section-head"><div><div class="eyebrow">LIFE NOTEBOOK</div><h3>나의 흔적</h3></div><button id="journal-open" class="simple-link">기록 열기 ↗</button></div><div id="memory-content" class="memory-content"><div class="empty-memory">첫 선택이 곧 나의 이야기가 됩니다.</div></div></div>
+      <div class="panel teaching-panel"><span>✦ 생각해 볼 질문</span><p id="reflect-prompt">나는 어떤 삶을 살고 싶을까?</p><small>선택에 하나의 정답은 없습니다.</small></div>
+    </aside>
+  </main>
+  <footer class="footnote"><span>이 마을의 지표는 가상이며, 개인의 결혼·출산 선택으로 출산율을 계산하지 않습니다.</span><span>© Original educational RPG · 2026</span></footer>
+</div>
+<script src="game.js" defer></script></body></html>

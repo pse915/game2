@@ -1,188 +1,208 @@
-"""실행: streamlit run app.py"""
-import copy, csv, hashlib, hmac, io, json, re, time
+"""Streamlit host: authentication, durable snapshots and teacher dashboard."""
+from __future__ import annotations
+import csv, hashlib, hmac, io, json, os, re, secrets
+from datetime import datetime, timezone
 from pathlib import Path
-import pandas as pd
 import streamlit as st
-from component import game
-from content import TITLE, SUBTITLE, NOTICE, SOURCE, CHAPTERS, NPCS, MAPS, ENDING, EVENTS
-from engine import new_state, verify_pin, handle, public_state, validate_state, score, objective, student_digest
-from storage import Store
-# ===== 시트 주소 설정 (app.py 안에 직접 넣기) =====
-# 방법 1: 아래 SHEET_ID에 시트 ID만 넣으세요. 예: "1AbCdEfGhIjKlMnOpQrStUvWx"
-# 방법 2: 전체 URL을 복사했다면 SHEET_URL에 넣으세요. 예: "https://docs.google.com/spreadsheets/d/1AbC.../edit"
-SHEET_ID = "여기에_시트_ID_붙여넣기"
-SHEET_URL = "https://docs.google.com/spreadsheets/d/153iTRzhQVQVFfj_LKOM4Qt9Za-H4mxZYb7Pi-pY94mA/edit"
-def _extract_sheet_id(value):
-    m = re.search(r"/d/([a-zA-Z0-9-_]+)", value or "")
-    if m:
-        return m.group(1)
-    v = (value or "").strip()
-    return v
-st.set_page_config(page_title=TITLE,page_icon='🏡',layout='wide',initial_sidebar_state='collapsed')
-st.markdown('<style>.block-container{max-width:1140px;padding-top:1.2rem;padding-bottom:1rem}h1{font-size:1.7rem!important}div[data-testid="stMetricValue"]{font-size:1.6rem}</style>',unsafe_allow_html=True)
-try:config=st.secrets.to_dict()
-except Exception:config={}
-# app.py 상수 하드코딩: Secrets에 sheet_id가 없어도 여기서 넣은 주소를 사용합니다.
-_hardcoded_id = _extract_sheet_id(SHEET_URL) if SHEET_URL.strip() else _extract_sheet_id(SHEET_ID)
-if _hardcoded_id and not _hardcoded_id.startswith("여기에_"):
-    config["sheet_id"] = _hardcoded_id
-@st.cache_resource
-def make_store(config_json):
-    return Store(json.loads(config_json))
-store=make_store(json.dumps(config,sort_keys=True))
+import streamlit.components.v1 as components
+from content import public_content, REQUIRED, CONCEPTS
+from engine import SCHEMA, new_state, apply, recap, ready
+from storage import make_store, StorageError
 
-def sync_state(s):
-    st.session_state.state=s
-    for k in ('student_id','class_code','nickname','x','y','chapter','flags','stats','start_time'):
-        st.session_state[k]=copy.deepcopy(s[k])
+st.set_page_config(page_title='황성마을 | 서라벌여중 생애설계',page_icon='🌅',layout='wide',initial_sidebar_state='collapsed')
+st.markdown('''<style>
+.stApp{background:#101b26;color:#e7f1ea} .block-container{padding-top:.8rem;max-width:1500px}
+[data-testid="stSidebar"]{background:#172737} h1,h2,h3{letter-spacing:-.035em}
+div.stButton>button[kind="primary"]{background:#e8ad6a;color:#172737;border:0}
+[data-testid="stHeader"]{background:transparent}
+</style>''', unsafe_allow_html=True)
 
-def enter(s,event):
-    sync_state(s);st.session_state.last_event=None
-    st.session_state.ui={'type':'notice','title':'미래마을에 오신 것을 환영해요.','text':NOTICE,'lines':['15~20분 수업에서는 게임 아래의 「20분 수업 모드」를 누르세요. NPC와 탐험·선택은 유지하고 필수 퀴즈 잠금만 줄입니다. 실명 대신 별명을 쓰세요.'], 'next':objective(s)}
-    st.session_state.save_status=store.save(s,event)
-    st.rerun()
-
-def teacher_panel():
-    st.title('교사 대시보드')
-    password=str(config.get('teacher_password',''))
-    if not password or password.startswith('교사용_'):
-        st.warning('Secrets에 안전한 teacher_password를 설정해야 교사 화면을 사용할 수 있습니다.');return
-    if not st.session_state.get('teacher_ok'):
-        if time.time()<st.session_state.get('teacher_wait',0):st.warning('잠시 후 다시 시도해 주세요.');return
-        with st.form('teacher_login'):
-            typed=st.text_input('교사용 비밀번호를 입력하세요.',type='password')
-            submitted=st.form_submit_button('교사 화면에 접속합니다.')
-        if submitted:
-            if hmac.compare_digest(typed,password):st.session_state.teacher_ok=True;st.rerun()
-            else:st.session_state.teacher_wait=time.time()+3;st.error('비밀번호가 맞지 않아요.')
-        return
-    c1,c2,c3=st.columns(3)
-    if c1.button('자료를 새로 불러옵니다.'):st.rerun()
-    if c2.button('CSV 백업을 시트로 재전송합니다.'):
-        try:st.success(f'{store.sync()}개 로그를 새로 전송했어요. 엔딩 기록도 확인했어요.')
-        except RuntimeError as e:st.error(str(e))
-    if c3.button('교사 화면에서 로그아웃합니다.'):
-        st.session_state.teacher_ok=False;st.rerun()
-    # logs에는 미완료 학생도 포함되므로 결과 시트 스키마 변경 없이 수업 상황을 확인합니다.
-    recent={}
-    for record in store.logs():
-        try:
-            st_data=validate_state(json.loads(record['state_json']))
-            recent[(st_data['class_code'],st_data['student_id'])]=student_digest(st_data)
-        except (ValueError,KeyError,TypeError):continue
-    if recent:
-        st.subheader('학생별 스토리 진행과 생애설계 기록')
-        st.caption('기존 logs의 최신 저장 기록을 읽습니다. 진행 중 학생도 표시됩니다. 기록 저장은 기존 방식 그대로입니다.')
-        progress_df=pd.DataFrame(recent.values())
-        selected_class=st.selectbox('진행 현황 반 선택',['전체 반']+sorted(progress_df['반'].unique().tolist()),key='progress_class')
-        if selected_class!='전체 반':progress_df=progress_df[progress_df['반']==selected_class]
-        st.dataframe(progress_df,hide_index=True,use_container_width=True)
-        st.download_button('학급 진행·생애설계 요약 CSV',progress_df.to_csv(index=False).encode('utf-8-sig'),'생애설계_학급요약.csv','text/csv')
-    rows=store.results()
-    if store.error:st.warning(store.error)
-    if not rows:st.info('아직 저장된 엔딩이 없어요. 미완료 학생은 평균에 포함하지 않습니다.');return
-    df=pd.DataFrame(rows)
-    for k in ('contribution','final_tfr','happiness','care','minutes','quiz_correct'):df[k]=pd.to_numeric(df[k],errors='coerce')
-    classes=['전체 반']+sorted(df['class_code'].astype(str).unique().tolist())
-    target=st.selectbox('살펴볼 반을 선택하세요.',classes)
-    if target!='전체 반':df=df[df.class_code.astype(str)==target]
-    st.caption('results 시트와 미전송 엔딩 백업을 사용하며 반+학번별 최신 완료 기록만 집계합니다. 새 게임을 시작했지만 아직 끝내지 않았다면 이전 완료 기록이 남아 있습니다.')
-    c1,c2,c3=st.columns(3);c1.metric('완료 학생 수',len(df));c2.metric('평균 가상 TFR',f'{df.final_tfr.mean():.2f}');c3.metric('평균 TFR 기여도',f'{df.contribution.mean():+.2f}')
-    chart=df.groupby('class_code')['contribution'].mean().rename('평균 TFR 기여도')
-    st.subheader('반별 평균 TFR 기여도를 비교합니다.')
-    st.bar_chart(chart,color='#9ad6b5',height=250)
-    st.caption('게임 규칙에 따른 가상 점수입니다. 개인의 가치·가족의 우열·현실 출산율을 평가하지 않습니다.')
-    display=df.rename(columns={'class_code':'반','student_id':'학번','nickname':'별명','ending':'엔딩','contribution':'기여도','final_tfr':'가상 TFR','happiness':'행복','care':'돌봄 부담','minutes':'경과 시간(분)','quiz_correct':'완료 퀴즈'})
-    st.dataframe(display[['반','학번','별명','엔딩','기여도','가상 TFR','행복','돌봄 부담','경과 시간(분)','완료 퀴즈']],hide_index=True,use_container_width=True)
-    safe_export=display.map(lambda value: "'"+value if isinstance(value,str) and value.startswith(('=','+','-','@','\t','\r')) else value)
-    st.download_button('결과 CSV를 내려받습니다.',safe_export.to_csv(index=False).encode('utf-8-sig'),'수업결과.csv','text/csv')
-    st.info('학생 식별정보가 포함되어 있습니다. 수업 목적 외 공유를 금지하고 학교 개인정보 보유기간에 따라 삭제하세요. 서버 CSV는 Streamlit Cloud 재시작 시 사라질 수 있습니다.')
-
-with st.sidebar:
-    st.header('미래마을 수업실')
-    mode=st.radio('화면을 선택하세요.',['학생 게임','교사 대시보드'])
-    st.caption(SOURCE)
-    st.caption('제작: 수업용 원본 픽셀 RPG입니다. 외부 게임 이미지나 소리를 사용하지 않습니다.')
-if mode=='교사 대시보드':teacher_panel();st.stop()
-st.title(TITLE)
-st.caption(SUBTITLE+' · 중3 15세 → 65세 · 15~20분')
-if 'state' not in st.session_state:
-    st.info('학번·반·별명을 입력해 시작해요. 이어하기에는 동일한 반·학번과 본인이 정한 저장 비밀번호가 필요합니다.')
-    with st.expander('수업 모형과 개인정보 안내를 읽습니다.',expanded=True):st.write(NOTICE);st.write('실명은 입력하지 마세요. 입력 정보와 선택 기록은 교사의 수업용 시트에 저장됩니다. 저장 비밀번호는 해시값으로만 보관됩니다.')
-    with st.form('start'):
-        c1,c2,c3=st.columns(3)
-        sid=c1.text_input('학번을 입력하세요. (숫자·영문·하이픈)',max_chars=20)
-        cls=c2.text_input('반 코드를 입력하세요. (예: 3-2)',max_chars=20)
-        nick=c3.text_input('별명을 입력하세요.',max_chars=12)
-        pin=st.text_input('본인 저장 비밀번호를 입력하세요. (4~32자)',type='password',max_chars=32)
-        confirmed=st.checkbox('새로 시작하면 이전 진행 대신 새 기록을 최신 기록으로 사용한다는 점을 확인했습니다.')
-        a,b=st.columns(2);resume=a.form_submit_button('이어하기');fresh=b.form_submit_button('새로시작')
-    if resume or fresh:
-        sid,cls,nick=sid.strip(),cls.strip(),nick.strip()
-        if not re.fullmatch(r'[A-Za-z0-9-]{1,20}',sid) or not re.fullmatch(r'[A-Za-z0-9가-힣_-]{1,20}',cls) or not nick or len(pin)<4:
-            st.error('학번·반·별명과 4자 이상의 비밀번호를 확인해 주세요.')
-        elif time.time()<st.session_state.get('login_wait',0):st.warning('잠시 후 다시 시도해 주세요.')
-        else:
-            try:
-                old=store.latest(sid,cls)
-                if old and not verify_pin(old,pin):
-                    st.session_state.login_wait=time.time()+3;st.error('기존 기록의 저장 비밀번호가 맞지 않아요. 교사에게 문의하세요.')
-                elif resume:
-                    if old:enter(old,'이어하기')
-                    else:st.warning('일치하는 최신 기록을 찾지 못했어요. Google 연결을 확인하거나 개인 저장파일을 복원해 주세요.')
-                elif not confirmed:st.warning('새로시작 확인란을 선택해 주세요.')
-                else:enter(new_state(sid,cls,nick,pin),'새로시작')
-            except (ValueError,KeyError,TypeError):st.error('기존 저장 기록의 형식이 올바르지 않아요. 교사에게 문의하세요.')
-            if store.error:st.warning(store.error)
-    with st.expander('개인 저장파일에서 복원합니다.'):
-        upload=st.file_uploader('본인의 미래마을 JSON 저장파일을 선택하세요.',type=['json'])
-        filepin=st.text_input('파일의 저장 비밀번호를 입력하세요.',type='password',key='file_pin')
-        if st.button('저장파일을 복원합니다.'):
-            try:
-                if upload is None:raise ValueError('파일을 먼저 선택해 주세요.')
-                if upload.size>1_000_000:raise ValueError('파일이 너무 커요.')
-                restored=validate_state(json.loads(upload.getvalue()))
-                if not verify_pin(restored,filepin):raise ValueError('저장 비밀번호가 맞지 않아요.')
-                restored['revision']+=1;enter(restored,'파일복원')
-            except (ValueError,KeyError,TypeError,UnicodeError) as e:st.error(str(e))
-    st.caption('키 설정 없이도 체험할 수 있지만 로컬 CSV는 영구 저장소가 아닙니다. 정규 수업에서는 Google Sheets 연결을 권장합니다.')
-    st.stop()
-s=st.session_state.state
-payload={'state':public_state(s),'maps':MAPS,'events':EVENTS,'npcs':NPCS,'chapters':CHAPTERS,'notice':NOTICE,'ui':st.session_state.get('ui'),'save_status':st.session_state.get('save_status','')}
-event=game(payload,key='village_'+s['run_id'])
-if isinstance(event,dict) and event.get('id') and event['id']!=st.session_state.get('last_event'):
-    st.session_state.last_event=event['id']
+@st.cache_resource(show_spinner=False)
+def get_store():
+    cfg={}
     try:
-        updated,ui=handle(s,event);sync_state(updated);st.session_state.ui=ui
-        st.session_state.save_status=store.save(updated,event.get('kind','진행'))
-    except (ValueError,KeyError,TypeError,IndexError) as e:
-        updated=copy.deepcopy(s);updated['revision']+=1;sync_state(updated)
-        st.session_state.ui={'type':'notice','title':'한 번 더 확인해 주세요.','text':str(e)}
-    st.rerun()
-status=st.session_state.get('save_status','')
-if '백업' in status or '실패' in status or '오류' in status:st.warning(status)
-else:st.caption(status)
-c1,c2,c3=st.columns(3)
-raw=json.dumps(st.session_state.state,ensure_ascii=False,indent=2).encode('utf-8')
-c1.download_button('개인 저장파일을 내려받습니다.',raw,'미래마을_'+s['class_code']+'_'+s['student_id']+'.json','application/json')
-if c2.button('현재 진행을 저장합니다.'):
-    st.session_state.save_status=store.save(s,'수동저장');st.rerun()
-if c3.button('저장하고 시작화면으로 돌아갑니다.'):
-    message=store.save(s,'나가기')
-    if '로컬 파일 쓰기도 실패' in message:st.error(message)
+        cfg=dict(st.secrets)
+    except Exception:
+        pass
+    if os.getenv('GOOGLE_SHEET_ID') and 'sheet_id' not in cfg:
+        cfg['sheet_id']=os.getenv('GOOGLE_SHEET_ID')
+    return make_store(cfg)
+
+try:
+    store=get_store()
+    store_problem=''
+except StorageError as exc:
+    store_problem=str(exc)
+    store=None
+
+frontend=Path(__file__).parent/'frontend'
+component=components.declare_component('sewol_port_world', path=str(frontend))
+
+def digest_pin(pin,salt=None):
+    salt=salt or secrets.token_hex(16)
+    encoded=hashlib.pbkdf2_hmac('sha256',pin.encode('utf-8'),bytes.fromhex(salt),200_000).hex()
+    return {'salt':salt,'hash':encoded}
+
+def valid_pin(pin,hashinfo):
+    try:
+        return hmac.compare_digest(digest_pin(pin,hashinfo['salt'])['hash'],hashinfo['hash'])
+    except (ValueError,KeyError,TypeError):
+        return False
+
+def normalize(v):return v.strip()
+
+def login():
+    st.title('🌅 세월항: 내일을 잇는 마을')
+    st.caption('서라벌여중 · 기술·가정 102~103쪽 · 나만의 생애설계 픽셀 어드벤처')
+    st.markdown('**이곳에서 당신의 삶과 마을의 미래는 서로 영향을 주고받습니다.** 마을을 걸으며 주민의 사건을 발견하고, 생애 단계마다 선택을 만들어 보세요.')
+    if store_problem:st.error(store_problem+' · 관리자에게 문의하세요. 설정된 Google Sheets가 있을 때 임의로 다른 저장소로 넘어가지 않습니다.')
+    with st.form('login-form'):
+        a,b,c=st.columns([1,1,1])
+        with a:cls=st.text_input('반/학급 코드',placeholder='예: 3-2',max_chars=18)
+        with b:sid=st.text_input('학생번호(실명 불필요)',placeholder='예: 07',max_chars=16)
+        with c:nick=st.text_input('게임 닉네임',placeholder='예: 별이',max_chars=15)
+        pin=st.text_input('개인 이어하기 암호 (8자 이상)',type='password',max_chars=100)
+        looks=st.select_slider('캐릭터 모습',options=[1,2,3,4,5,6],value=1)
+        restart=st.checkbox('기존 이어하기 대신 새 생애를 시작하기 (이전 기록은 보관됨)')
+        submitted=st.form_submit_button('마을 입장 / 이어하기',type='primary',use_container_width=True)
+    st.info('결혼·출산 여부로 삶을 평가하지 않습니다. 선택마다 여러 가능성이 있으며, 마을 통계·경제 지표는 실제 국가 통계가 아닌 가상의 수업 모형입니다.')
+    if not submitted:return
+    cls,sid,nick=map(normalize,[cls,sid,nick])
+    if not re.fullmatch(r'[0-9A-Za-z가-힣_-]{1,18}',cls) or not re.fullmatch(r'[0-9A-Za-z_-]{1,16}',sid):
+        st.error('반과 학생번호에는 글자·숫자·하이픈만 사용하세요.');return
+    if len(pin)<8:st.error('이어하기 암호는 8자 이상 입력하세요.');return
+    if store is None:return
+    try:old=store.load(cls,sid)
+    except Exception as exc:st.error(f'저장 데이터를 불러오지 못했습니다: {exc}');return
+    if old and not valid_pin(pin,old.get('auth',{})):
+        st.error('기존 학생번호의 암호가 일치하지 않습니다. 다른 기록에 접근할 수 없습니다.');return
+    if old and not restart:
+        state=old
     else:
-        for key in ['state','ui','last_event','student_id','class_code','nickname','x','y','chapter','flags','stats','start_time']:st.session_state.pop(key,None)
-        st.rerun()
-with st.expander('선택 기록과 경제 상황을 확인합니다.'):
-    st.write(f"현재 월 주거비는 {s['stats']['housing']}만원, 개인 월 소득은 {s['stats']['income']}만원입니다. 실제 가계 계산이 아닌 수업용 설정입니다.")
-    for h in s['history']:st.write(f"{h['age']}세: {h['label']}");st.caption(' '.join(h['extra']))
-    st.caption('이동은 화면 내부에서 즉시 처리되며, 25초 주기 또는 대화·선택·포탈 이동·저장 버튼에서 서버에 반영됩니다. 브라우저를 닫기 전에 저장하세요.')
-if s['finished']:
-    d,t=score(s)
-    st.subheader('나의 엔딩을 수업 기록으로 남깁니다.')
-    st.write(public_state(s)['ending_info']['message'])
-    st.bar_chart(pd.DataFrame({'가상 TFR':[1.30,t]},index=['전국 비교 기준(가정)','나의 가상 결과']),height=230,color='#9ad6b5')
-    st.caption('전국 기준 1.30은 수업용 가정값입니다. 음수 결과는 고정 계산식의 한계이며 실제 출산율이 아닙니다.')
-    st.write('어떤 정책이 행복과 돌봄 부담을 함께 바꾸었나요? 자녀 수를 바꾸지 않고도 더 나은 삶을 만드는 방법은 무엇인가요?')
-    report={'반':s['class_code'],'학번':s['student_id'],'별명':s['nickname'],'엔딩':s['ending'],'TFR 기여도':d,'최종 가상 TFR':t,'선택 기록':s['history']}
-    st.download_button('나의 결과 기록을 내려받습니다.',json.dumps(report,ensure_ascii=False,indent=2),'미래마을_결과.json','application/json')
+        state=new_state(cls,sid,nick or '여행자',looks-1)
+        state['auth']=digest_pin(pin)
+        try:store.save(state)
+        except Exception as exc:st.warning(f'첫 저장이 실패했습니다: {exc}. JSON 백업을 사용하세요.')
+    st.session_state['world_state']=state
+    st.rerun()
+
+def world():
+    state=st.session_state['world_state']
+    st.markdown(f"<span style='font-size:1.35rem;font-weight:800'>🌅 세월항 <span style='color:#9bcfc0;font-size:.85rem'>내일을 잇는 마을 · {state['nickname']}의 이야기</span></span>",unsafe_allow_html=True)
+    with st.sidebar:
+        st.subheader('나의 생애 일지')
+        st.write(f"**{state['age']}세 · {['청년기','성인기','노년기'][state['stage']]}**")
+        st.write(f"필수 사건: {sum(k in state['decisions'] for k in REQUIRED[state['stage']])}/{len(REQUIRED[state['stage']])}")
+        st.write(f"경험한 학습 주제: {len(state['concepts'])}/{len(CONCEPTS)}")
+        st.caption('지도에서 구역을 터치하면 빠른 이동이 됩니다. 사건 선택 후 저장되며, 이동만으로 저장 요청하지 않습니다.')
+        st.markdown('---')
+        with st.expander('학습 주제 기록'):
+            for key,value in CONCEPTS.items():st.write(('✅ ' if key in state['concepts'] else '▫️ ')+value)
+        with st.expander('백업·복원'):
+            st.download_button('내 게임 JSON 내려받기',json.dumps(state,ensure_ascii=False,indent=2),file_name=f"sewol_{state['student_id']}.json",mime='application/json')
+            upload=st.file_uploader('내가 받은 백업 JSON 복원',type=['json'])
+            if upload and st.button('이 백업 복원'):
+                try:
+                    data=json.loads(upload.getvalue())
+                    if data['schema']!=SCHEMA or (data['class_code'],data['student_id'],data['run_id'])!=(state['class_code'],state['student_id'],state['run_id']):
+                        raise ValueError('스키마 또는 학생/게임 식별자가 일치하지 않습니다.')
+                    if data['revision']<state['revision']:
+                        raise ValueError('현재 저장본보다 오래된 버전입니다.')
+                    if data.get('auth')!=state.get('auth'):
+                        raise ValueError('인증 정보가 일치하지 않습니다.')
+                    st.session_state['world_state']=data
+                    store.save(data)
+                    st.rerun()
+                except Exception as exc:st.error(f'복원 거부: {exc}')
+        if st.button('다른 학생 입장'):
+            del st.session_state['world_state']
+            st.rerun()
+    # Nonce-based handling avoids duplicate Streamlit iframe message replays.
+    result=component(state={k:v for k,v in state.items() if k!='auth'},content=public_content(),
+                     notice=st.session_state.get('notice',''),key='sewol_game',default=None)
+    if isinstance(result,dict) and result.get('nonce'):
+        revised,feedback=apply(state,result)
+        if revised['revision']!=state['revision']:
+            st.session_state['world_state']=revised
+            st.session_state['notice']=feedback
+            try:
+                store.save(revised)
+                st.session_state.pop('save_error',None)
+            except Exception as exc:
+                st.session_state['save_error']=str(exc)
+            st.rerun()
+    if st.session_state.get('save_error'):
+        st.error('서버 저장이 실패했습니다. 왼쪽의 JSON 내려받기로 백업하세요. '+st.session_state['save_error'])
+    if state['ended']:
+        st.markdown('### 생애설계 기록 · 학생용 소감문')
+        info=recap(state)
+        l,r=st.columns(2)
+        with l:
+            st.write('**내가 선택한 생활**')
+            st.write(f"직업: {info['career']} · 주거: {info['housing']} · 정책: {info['policy']}")
+            st.write(f"노후 준비: {', '.join(x.removeprefix('ret_') for x in info['retirement'])}")
+        with r:st.write('**돌아보기**: '+info['message'])
+        st.caption('이 기록은 좋은 삶·나쁜 삶을 나누는 성적표가 아닙니다.')
+        with st.form('reflection-form'):
+            reflection=st.text_area('소감문 — 무엇을 중요하게 생각했고, 이제 무엇을 준비할까?',value=state.get('reflection',''),height=115)
+            save_ref=st.form_submit_button('소감 저장',type='primary')
+        if save_ref:
+            revised,_=apply(state,{'type':'reflection','text':reflection,'nonce':secrets.token_hex(12)})
+            st.session_state['world_state']=revised
+            try:store.save(revised)
+            except Exception as exc:st.error(f'소감 저장 실패: {exc}')
+            st.rerun()
+
+def dashboard():
+    st.title('🧑‍🏫 교사 전용 대시보드')
+    try:configured=str(st.secrets.get('teacher_password',''))
+    except Exception:configured=''
+    configured=configured or os.getenv('TEACHER_PASSWORD','')
+    if not configured:
+        st.warning('교사 암호가 설정되지 않아 대시보드를 사용할 수 없습니다. .streamlit/secrets.toml에 teacher_password를 설정하세요.')
+        return
+    pw=st.text_input('교사 암호',type='password')
+    if not hmac.compare_digest(pw,configured):
+        st.info('교사 인증 후 학생별 학습 경험과 마을 선택의 분포를 확인합니다.')
+        return
+    if store is None:st.error(store_problem);return
+    try:data=store.all_latest()
+    except Exception as exc:st.error(f'조회 실패: {exc}');return
+    classes=sorted({x['class_code'] for x in data})
+    target=st.selectbox('학급 필터',['전체']+classes)
+    filtered=[x for x in data if target=='전체' or x['class_code']==target]
+    done=sum(x.get('ended',False) for x in filtered)
+    c1,c2,c3=st.columns(3)
+    c1.metric('기록 학생',len(filtered));c2.metric('완료',done);c3.metric('완료 비율',f'{done/max(len(filtered),1)*100:.0f}%')
+    policies={}
+    for s in filtered:
+        p=s.get('flags',{}).get('policy','아직 선택하지 않음')
+        policies[p]=policies.get(p,0)+1
+    if policies:
+        st.subheader('사회적 대응 선택')
+        st.bar_chart([{'정책':k,'학생 수':v} for k,v in policies.items()],x='정책',y='학생 수')
+    rows=[]
+    for x in filtered:
+        flags=x.get('flags',{})
+        try:
+            minutes=max(0,(datetime.fromisoformat(x['last_update'])-datetime.fromisoformat(x['started_at'])).total_seconds()/60)
+        except (KeyError,ValueError):
+            minutes=0
+        rows.append({'학급':x['class_code'],'번호':x['student_id'],'닉네임':x['nickname'],
+                     '시기':['청년','성인','노년'][x['stage']],'완료':x.get('ended',False),'경과분(추정)':round(minutes,1),
+                     '직업':flags.get('career',''),'주거':flags.get('housing',''),
+                     '돌봄':flags.get('care',''),'정책':flags.get('policy',''),
+                     '학습주제수':len(x['concepts']),
+                     '재무':flags.get('ret_finance',''),'건강':flags.get('ret_health',''),
+                     '여가':flags.get('ret_leisure',''),'관계':flags.get('ret_social',''),
+                     '소감':x.get('reflection','')})
+    st.dataframe(rows,hide_index=True,use_container_width=True)
+    buf=io.StringIO();w=csv.DictWriter(buf,fieldnames=list(rows[0]) if rows else ['학급','번호'])
+    w.writeheader();w.writerows(rows)
+    st.download_button('선택 기록 CSV', '\ufeff'+buf.getvalue(),'sewol_class_summary.csv','text/csv')
+    st.caption('경과분은 첫 저장부터 마지막 활동까지의 시각 차이로, 자리 비운 시간도 포함할 수 있는 추정치입니다. 가족 형태나 직업을 성적 기준으로 삼지 않습니다.')
+
+mode=st.query_params.get('mode','game')
+if mode=='teacher':dashboard()
+elif 'world_state' not in st.session_state:login()
+else:world()

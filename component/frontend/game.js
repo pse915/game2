@@ -2,7 +2,7 @@
 'use strict';
 let data=null, state=null, position={x:5,y:9}, revision=-1, pending=false, modalOpen=false;
 let direction='down', lastMove=0, moved=false, lastSave=Date.now(), sound=false, audio=null;
-let pendingSince=0, visual={x:5,y:9}, previousZone=-1;
+let pendingSince=0, idleSince=Date.now(), visual={x:5,y:9}, previousZone=-1;
 const $=id=>document.getElementById(id);
 const canvas=$('world'),ctx=canvas.getContext('2d');
 ctx.imageSmoothingEnabled=false;
@@ -50,7 +50,7 @@ function move(dir){
   lastMove=Date.now();direction=dir;
   const [dx,dy]={up:[0,-1],down:[0,1],left:[-1,0],right:[1,0]}[dir];
   const x=position.x+dx,y=position.y+dy;
-  if(canWalk(x,y)){position={x,y};moved=true;const portal=currentMap().portals.find(p=>p.x===x&&p.y===y);if(portal){beep(660);send('portal');}}
+  if(canWalk(x,y)){position={x,y};moved=true;idleSince=Date.now();const portal=currentMap().portals.find(p=>p.x===x&&p.y===y);if(portal){beep(660);send('portal');}}
 }
 function talk(){if(!state||pending)return;if(state.finished){send('ending');return;}const n=npcNear();if(n){beep(520);send('talk',{npc:n.id});}else{$('status').textContent='사람 바로 옆으로 한 칸 더 가까이 가 주세요.';}}
 const keyDir={ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right',w:'up',s:'down',a:'left',d:'right'};
@@ -62,11 +62,13 @@ window.addEventListener('keydown',e=>{
 });
 window.addEventListener('keyup',e=>keys.delete(keyDir[e.key]));
 window.addEventListener('blur',()=>keys.clear());
+window.addEventListener('pointercancel',()=>keys.clear());
+document.addEventListener('visibilitychange',()=>{if(document.hidden)keys.clear();});
 document.querySelectorAll('[data-dir]').forEach(b=>{
   b.addEventListener('pointerdown',e=>{e.preventDefault();b.setPointerCapture(e.pointerId);keys.add(b.dataset.dir);move(b.dataset.dir);});
   ['pointerup','pointercancel','lostpointercapture'].forEach(type=>b.addEventListener(type,()=>keys.delete(b.dataset.dir)));
 });
-$('talk').onclick=talk;$('book').onclick=()=>send('book');$('policy').onclick=()=>send('policy');$('save').onclick=()=>send('save');
+$('talk').onclick=talk;$('book').onclick=()=>send('book');$('policy').onclick=()=>send('policy_menu');$('life').onclick=()=>send('life_card');$('classroom').onclick=()=>send('classroom');$('save').onclick=()=>send('save');
 $('sound').onclick=()=>{sound=!sound;$('sound').textContent=sound?'소리를 끕니다.':'소리를 켭니다.';beep();};
 $('full').onclick=async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await $('game').requestFullscreen();}catch(e){$('status').textContent='이 환경은 전체화면을 지원하지 않아요. 브라우저 확대 기능을 사용해 주세요.';}height();};
 function updateHud(){
@@ -77,7 +79,8 @@ function updateHud(){
   const rows=[['내 자녀수',s.children+'명',s.children/3],['TFR 기여도',(s.contribution>=0?'+':'')+s.contribution.toFixed(2),(s.contribution+2)/5],['마을출산율',s.village_tfr.toFixed(2),s.village_tfr/3.5],['고령화율',s.aging.toFixed(1)+'%',s.aging/30],['마을활력',s.vitality+'/100',s.vitality/100],['가족행복',s.happiness+'/100',s.happiness/100],['돌봄부담',s.care+'/100',s.care/100]];
   rows.forEach(([label,value,ratio],i)=>{const box=text('div','','metric');box.append(text('span',label),text('b',value));const tr=text('div','','track'),fill=text('div','','fill'+((i===3||i===6)?' danger':''));fill.style.width=Math.max(0,Math.min(100,ratio*100))+'%';tr.append(fill);box.append(tr);$('hud').append(box);});
   $('policy').disabled=!state.flags.policy_offer||state.finished;
-  $('policy').textContent=state.flags.policy_card?'정책카드 확인':'정책카드';
+  $('policy').textContent='마을 정책 회의';
+  $('progress').textContent=state.progress+'% 진행 · '+(6-state.chapter)+'장 남음';
   $('maplabel').textContent='방향키 / WASD / 화면 방향버튼 · 빛나는 타일은 포탈입니다.';
 }
 function closeDialog(){modalOpen=false;$('modal').classList.add('hidden');$('stage').focus({preventScroll:true});height();}
@@ -94,7 +97,14 @@ function showDialog(ui){
   const actions=text('div','','dialog-actions');
   if(ui.type==='talk'){
     ui.buttons.forEach(b=>actions.append(button(b.label,()=>send(b.kind,{npc:ui.npc}),'primary')));
-    box.append(actions);showCards(ui.cards,box);
+    box.append(actions);if(ui.cards?.length){const more=document.createElement('details');more.append(text('summary','관련 도감 더 보기'));showCards(ui.cards,more);box.append(more);}
+  }else if(ui.type==='policy_menu'){
+    const available=[['housing','청년 주거 지원','일자리·주거 불안을 줄여요. 대상과 예산에 한계가 있어요.'],['flex','유연근무와 평등한 돌봄','일·가정 양립을 도와요. 사업장의 협력이 필요해요.'],['elder','노인 돌봄과 세대 교류','돌봄과 고립을 줄여요. 서비스 인력이 필요해요.']];
+    available.forEach(([code,name,note])=>{const b=button(name,()=>send('policy_select',{code}),'choice');b.disabled=ui.selected.includes(code)||ui.selected.length>=2;b.append(text('small',note));actions.append(b);});box.append(actions,text('p','선택한 정책: '+ui.selected.length+'/2 · 교육용 시뮬레이션입니다.'));
+  }else if(ui.type==='life_card'){
+    const c=ui.card;[['청년기',c.youth],['일과 삶',c.balance],['관계',c.relationships],['내가 탐색한 가치',c.values],['마을 정책',c.policies.join(', ')||'아직 선택하지 않음']].forEach(([a,b])=>box.append(text('p',a+' · '+b)));
+    Object.entries(c.retirement).forEach(([a,b])=>box.append(text('p',a+' · '+b)));box.append(text('p',c.next_step),text('p',c.reality));
+    box.append(button('카드 내용을 복사하기',()=>{const result=box.innerText||c.youth+' / '+c.balance+' / '+c.relationships;navigator.clipboard?.writeText(result);},'primary'));
   }else if(ui.type==='quiz'){
     ui.answers.forEach((a,i)=>actions.append(button(a,()=>send('answer',{answer:i}),'choice')));box.append(actions);
   }else if(ui.type==='choices'){
@@ -118,6 +128,12 @@ function showDialog(ui){
   }else if(ui.type==='ending'){
     const e=state.ending_info;if(!e){box.append(text('p','모든 챕터를 마친 뒤 미래시장을 만나세요.'));return;}
     box.append(text('p',e.code+' · '+e.name),text('p',e.message,'bigscore'));
+    if(state.flags.classroom_mode){
+      box.append(text('p','가상 인구 수치보다 중요한 것은 개인의 선택을 존중하고 마을의 돌봄·일자리·주거 조건을 함께 바꾸는 일이에요.'));
+      box.append(button('나의 생애설계 카드 확인',()=>send('life_card'),'primary'));
+      box.append(text('p','소감문: ① 기억에 남는 마을 문제 ② 선택한 해결책과 이유 ③ 개인·사회의 준비 ④ 나의 첫 실천을 적어 보세요.'));
+      return;
+    }
     const chart=text('div','','comparison');chart.append(text('p','전국 기준과 비교합니다. 두 값 모두 수업용이며 전국 기준 1.30은 가정값입니다.'));
     [['전국 비교 기준',1.30,'baseline'],['나의 최종 가상 TFR',e.tfr,'']].forEach(([label,value,cls])=>{chart.append(text('div',label+' '+value.toFixed(2)));const b=text('div','','bar '+cls);b.style.width=Math.min(100,Math.max(0,value)/3.5*100)+'%';chart.append(b);});
     if(e.tfr<0)chart.append(text('p','음수는 고정 계산식의 결과입니다. 실제 합계출산율에는 음수가 없으며 그래프 막대만 0에서 시작합니다. 숫자는 보정하지 않았습니다.'));
@@ -127,6 +143,8 @@ function showDialog(ui){
     box.append(text('p','p.103에서 찾은 마을의 다음 약속','ending-letter'));
     e.advice.forEach(a=>box.append(text('p',a)));
     if(e.code==='C')box.append(text('p','신문 아카이브: “확 늙어버린 대한민국” — 2016.9.7 당시 전망입니다. 현재 뉴스가 아닙니다.'));
+    box.append(button('나의 생애설계 카드 확인',()=>send('life_card'),'primary'));
+    box.append(text('p','소감문: ① 기억에 남는 마을 문제 ② 선택한 해결책과 이유 ③ 개인·사회의 준비 ④ 나의 첫 실천을 적어 보세요.'));
     box.append(text('p','이 엔딩은 행복한 가족의 자격이나 개인의 도덕성을 판정하지 않습니다. 무자녀 공동 돌봄도 존중받습니다.'),text('p','게임 아래의 개인 저장파일과 결과 기록을 내려받고 성찰 활동을 해 주세요.'));
   }else if(ui.type==='notice'){
     if(ui.next)box.append(text('p',ui.next,'feedback'));
@@ -191,6 +209,7 @@ function draw(ts){
   }
   const n=npcNear();$('hint').textContent=n?'['+n.name+'] 옆이에요. 말걸기 버튼을 누르세요.':'현재 위치 '+position.x+', '+position.y+' · 노란 ! 표시가 이번 챕터 안내자예요.';
   $('talk').disabled=pending||(!n&&!state.finished);
+  if(!modalOpen&&!pending&&Date.now()-idleSince>45000&&state.chapter<6)$('hint').textContent='길을 잃었나요? 노란 ! 표시의 주민을 만나 보세요. '+state.objective;
   if(moved&&!pending&&!modalOpen&&Date.now()-lastSave>25000)send('save');
   if(pending&&Date.now()-pendingSince>20000)$('status').textContent='저장이 지연되고 있어요. 잠시 기다리거나 아래의 개인 저장파일을 내려받아 주세요. 새로고침 전에는 저장 여부를 확인하세요.';
 }

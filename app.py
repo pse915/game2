@@ -38,7 +38,7 @@ def sync_state(s):
 
 def enter(s,event):
     sync_state(s);st.session_state.last_event=None
-    st.session_state.ui={'type':'notice','title':'미래마을에 오신 것을 환영해요.','text':NOTICE,'lines':['예상 플레이 시간은 15~20분입니다. 방향키는 게임 화면을 한 번 눌러야 작동합니다. 개인정보 보호를 위해 실명 대신 별명을 쓰세요.'], 'next':objective(s)}
+    st.session_state.ui={'type':'notice','title':'미래마을에 오신 것을 환영해요.','text':NOTICE,'lines':['15~20분 수업에서는 게임 아래의 「20분 수업 모드」를 누르세요. NPC와 탐험·선택은 유지하고 필수 퀴즈 잠금만 줄입니다. 실명 대신 별명을 쓰세요.'], 'next':objective(s)}
     st.session_state.save_status=store.save(s,event)
     st.rerun()
 

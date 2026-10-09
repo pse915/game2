@@ -1,0 +1,125 @@
+Python 전체 문법 검사
+0
+
+
+회귀 테스트 1회차
+0
+test_all_2304_paths (test_engine.EngineTests.test_all_2304_paths) ... ok
+test_all_quiz_keys (test_engine.EngineTests.test_all_quiz_keys) ... ok
+test_bonus_fixed (test_engine.EngineTests.test_bonus_fixed) ... ok
+test_checklist_and_finish (test_engine.EngineTests.test_checklist_and_finish) ... ok
+test_locks (test_engine.EngineTests.test_locks) ... ok
+test_negative_not_clipped (test_engine.EngineTests.test_negative_not_clipped) ... ok
+test_no_child_no_personal_parental_bonus (test_engine.EngineTests.test_no_child_no_personal_parental_bonus) ... ok
+test_policy_idempotent (test_engine.EngineTests.test_policy_idempotent) ... ok
+test_portals_and_buildings (test_engine.EngineTests.test_portals_and_buildings) ... ok
+test_quiz_and_proximity (test_engine.EngineTests.test_quiz_and_proximity) ... ok
+test_save_validation_pin (test_engine.EngineTests.test_save_validation_pin) ... ok
+test_thresholds_and_precedence (test_engine.EngineTests.test_thresholds_and_precedence) ... ok
+test_auth_error_stops_connection_retry (test_storage.StorageTests.test_auth_error_stops_connection_retry) ... ok
+test_offline_roundtrip_latest_and_class (test_storage.StorageTests.test_offline_roundtrip_latest_and_class) ... ok
+test_partial_write_repaired (test_storage.StorageTests.test_partial_write_repaired) ... ok
+test_results_latest_only (test_storage.StorageTests.test_results_latest_only) ... ok
+test_sync_idempotent (test_storage.StorageTests.test_sync_idempotent) ... ok
+
+----------------------------------------------------------------------
+Ran 17 tests in 0.632s
+
+OK
+
+
+회귀 테스트 2회차
+0
+test_all_2304_paths (test_engine.EngineTests.test_all_2304_paths) ... ok
+test_all_quiz_keys (test_engine.EngineTests.test_all_quiz_keys) ... ok
+test_bonus_fixed (test_engine.EngineTests.test_bonus_fixed) ... ok
+test_checklist_and_finish (test_engine.EngineTests.test_checklist_and_finish) ... ok
+test_locks (test_engine.EngineTests.test_locks) ... ok
+test_negative_not_clipped (test_engine.EngineTests.test_negative_not_clipped) ... ok
+test_no_child_no_personal_parental_bonus (test_engine.EngineTests.test_no_child_no_personal_parental_bonus) ... ok
+test_policy_idempotent (test_engine.EngineTests.test_policy_idempotent) ... ok
+test_portals_and_buildings (test_engine.EngineTests.test_portals_and_buildings) ... ok
+test_quiz_and_proximity (test_engine.EngineTests.test_quiz_and_proximity) ... ok
+test_save_validation_pin (test_engine.EngineTests.test_save_validation_pin) ... ok
+test_thresholds_and_precedence (test_engine.EngineTests.test_thresholds_and_precedence) ... ok
+test_auth_error_stops_connection_retry (test_storage.StorageTests.test_auth_error_stops_connection_retry) ... ok
+test_offline_roundtrip_latest_and_class (test_storage.StorageTests.test_offline_roundtrip_latest_and_class) ... ok
+test_partial_write_repaired (test_storage.StorageTests.test_partial_write_repaired) ... ok
+test_results_latest_only (test_storage.StorageTests.test_results_latest_only) ... ok
+test_sync_idempotent (test_storage.StorageTests.test_sync_idempotent) ... ok
+
+----------------------------------------------------------------------
+Ran 17 tests in 0.626s
+
+OK
+
+
+회귀 테스트 3회차
+0
+test_all_2304_paths (test_engine.EngineTests.test_all_2304_paths) ... ok
+test_all_quiz_keys (test_engine.EngineTests.test_all_quiz_keys) ... ok
+test_bonus_fixed (test_engine.EngineTests.test_bonus_fixed) ... ok
+test_checklist_and_finish (test_engine.EngineTests.test_checklist_and_finish) ... ok
+test_locks (test_engine.EngineTests.test_locks) ... ok
+test_negative_not_clipped (test_engine.EngineTests.test_negative_not_clipped) ... ok
+test_no_child_no_personal_parental_bonus (test_engine.EngineTests.test_no_child_no_personal_parental_bonus) ... ok
+test_policy_idempotent (test_engine.EngineTests.test_policy_idempotent) ... ok
+test_portals_and_buildings (test_engine.EngineTests.test_portals_and_buildings) ... ok
+test_quiz_and_proximity (test_engine.EngineTests.test_quiz_and_proximity) ... ok
+test_save_validation_pin (test_engine.EngineTests.test_save_validation_pin) ... ok
+test_thresholds_and_precedence (test_engine.EngineTests.test_thresholds_and_precedence) ... ok
+test_auth_error_stops_connection_retry (test_storage.StorageTests.test_auth_error_stops_connection_retry) ... ok
+test_offline_roundtrip_latest_and_class (test_storage.StorageTests.test_offline_roundtrip_latest_and_class) ... ok
+test_partial_write_repaired (test_storage.StorageTests.test_partial_write_repaired) ... ok
+test_results_latest_only (test_storage.StorageTests.test_results_latest_only) ... ok
+test_sync_idempotent (test_storage.StorageTests.test_sync_idempotent) ... ok
+
+----------------------------------------------------------------------
+Ran 17 tests in 0.626s
+
+OK
+
+
+JavaScript 구문 검사
+0
+
+
+Python 문법 재검사
+0
+
+
+통합 회귀 검사 4회차
+0
+test_all_2304_paths (test_engine.EngineTests.test_all_2304_paths) ... ok
+test_all_quiz_keys (test_engine.EngineTests.test_all_quiz_keys) ... ok
+test_bonus_fixed (test_engine.EngineTests.test_bonus_fixed) ... ok
+test_checklist_and_finish (test_engine.EngineTests.test_checklist_and_finish) ... ok
+test_locks (test_engine.EngineTests.test_locks) ... ok
+test_negative_not_clipped (test_engine.EngineTests.test_negative_not_clipped) ... ok
+test_no_child_no_personal_parental_bonus (test_engine.EngineTests.test_no_child_no_personal_parental_bonus) ... ok
+test_policy_idempotent (test_engine.EngineTests.test_policy_idempotent) ... ok
+test_portals_and_buildings (test_engine.EngineTests.test_portals_and_buildings) ... ok
+test_quiz_and_proximity (test_engine.EngineTests.test_quiz_and_proximity) ... ok
+test_save_validation_pin (test_engine.EngineTests.test_save_validation_pin) ... ok
+test_thresholds_and_precedence (test_engine.EngineTests.test_thresholds_and_precedence) ... ok
+test_counseling_recovery (test_journey.JourneyTests.test_counseling_recovery) ... ok
+test_four_full_journeys (test_journey.JourneyTests.test_four_full_journeys) ... ok
+test_auth_error_stops_connection_retry (test_storage.StorageTests.test_auth_error_stops_connection_retry) ... ok
+test_offline_roundtrip_latest_and_class (test_storage.StorageTests.test_offline_roundtrip_latest_and_class) ... ok
+test_partial_write_repaired (test_storage.StorageTests.test_partial_write_repaired) ... ok
+test_results_latest_only (test_storage.StorageTests.test_results_latest_only) ... ok
+test_sync_idempotent (test_storage.StorageTests.test_sync_idempotent) ... ok
+
+----------------------------------------------------------------------
+Ran 19 tests in 0.698s
+
+OK
+
+
+JavaScript 구문 재검사
+0
+
+
+JavaScript DOM·Canvas 모사 스모크
+0
+다섯 지도, 모든 대화 유형, 엔딩 A/B/C/D, 이동·저장 프로토콜을 모사 환경에서 검사했습니다.

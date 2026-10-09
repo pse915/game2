@@ -4,7 +4,7 @@
 <body><main id="game">
 <header><div><span class="tag">미래마을 생애설계 어드벤처</span><h1 id="place">마을을 불러오고 있어요.</h1></div><div id="age"></div></header>
 <div id="hud" aria-label="마을의 현재 지표"></div>
-<div class="quest"><strong id="objective"></strong><span id="badges"></span></div>
+<div class="quest"><strong id="objective"></strong><span id="badges"></span><span id="progress" aria-label="스토리 진행도"></span></div>
 <div id="stage" tabindex="0" aria-label="방향키로 이동합니다. NPC 바로 옆에서 Enter로 말을 겁니다.">
 <canvas id="world" width="768" height="480" aria-label="24×15 타일 미래마을 지도"></canvas>
 <div id="maplabel"></div><div id="hint" aria-live="polite"></div>
@@ -12,6 +12,6 @@
 </div>
 <div id="controls"><div class="pad" aria-label="이동 방향 버튼">
 <button data-dir="up" class="up" aria-label="위로 이동합니다.">▲</button><button data-dir="left" class="left" aria-label="왼쪽으로 이동합니다.">◀</button><button data-dir="down" class="down" aria-label="아래로 이동합니다.">▼</button><button data-dir="right" class="right" aria-label="오른쪽으로 이동합니다.">▶</button>
-</div><div class="actions"><button id="talk" class="primary">말걸기 · Enter</button><button id="book">지식 도감</button><button id="policy">정책카드</button><button id="save">저장합니다.</button><button id="sound">소리를 켭니다.</button><button id="full">화면을 확대합니다.</button></div></div>
+</div><div class="actions"><button id="talk" class="primary">말걸기 · Enter</button><button id="book">지식 도감</button><button id="life">생애설계 카드</button><button id="classroom">20분 수업 모드</button><button id="policy">정책카드</button><button id="save">저장합니다.</button><button id="sound">소리를 켭니다.</button><button id="full">화면을 확대합니다.</button></div></div>
 <footer id="status" aria-live="polite">방향키 또는 화면의 방향버튼으로 움직여요. 빛나는 포탈에 들어가면 다른 구역으로 이동해요.</footer>
 </main><script src="game.js"></script></body></html>

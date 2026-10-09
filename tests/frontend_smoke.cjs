@@ -11,11 +11,11 @@ class Element {
   querySelector(selector){if(selector==='h2')return this.children.find(x=>x.tag==='h2')||new Element('h2');return new Element('button');}
   querySelectorAll(){return [];}
 }
-const ids={};['world','game','stage','status','talk','book','policy','save','sound','full','place','age','objective','badges','hud','maplabel','hint','modal','dialog'].forEach(id=>ids[id]=new Element());
+const ids={};['world','game','stage','status','talk','book','policy','save','sound','full','place','age','objective','badges','hud','maplabel','hint','modal','dialog','progress','life','classroom'].forEach(id=>ids[id]=new Element());
 ids.world.getContext=()=>({fillRect(){},fillText(){},imageSmoothingEnabled:false});
 const listeners={},sent=[],frames=[];
 const parent={postMessage(message){sent.push(message);}};
-const sandbox={console,Date,Math,crypto:require('crypto').webcrypto,Set,window:{parent,addEventListener(type,fn){listeners[type]=fn;}},document:{getElementById:id=>ids[id],createElement:tag=>new Element(tag),querySelectorAll:()=>[],body:{scrollHeight:900},activeElement:null},ResizeObserver:class{observe(){}},requestAnimationFrame:fn=>frames.push(fn),setTimeout:fn=>fn()};
+const sandbox={console,Date,Math,crypto:require('crypto').webcrypto,Set,window:{parent,addEventListener(type,fn){listeners[type]=fn;}},document:{addEventListener(){},getElementById:id=>ids[id],createElement:tag=>new Element(tag),querySelectorAll:()=>[],body:{scrollHeight:900},activeElement:null},ResizeObserver:class{observe(){}},requestAnimationFrame:fn=>frames.push(fn),setTimeout:fn=>fn()};
 vm.createContext(sandbox);vm.runInContext(fs.readFileSync('component/frontend/game.js','utf8'),sandbox);
 const fixture=JSON.parse(fs.readFileSync(process.argv[2]||'tests/frontend_fixture.json','utf8'));
 function render(payload){listeners.message({source:parent,data:{type:'streamlit:render',args:{data:payload}}});}

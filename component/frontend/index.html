@@ -1,17 +1,17 @@
 <!doctype html>
-<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>미래마을 생애설계 어드벤처</title><link rel="stylesheet" href="style.css"></head>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>미래마을 2.0 | 시간을 걷는 생애설계 RPG</title><link rel="stylesheet" href="style.css"></head>
 <body><main id="game">
-<header><div><span class="tag">미래마을 생애설계 어드벤처</span><h1 id="place">마을을 불러오고 있어요.</h1></div><div id="age"></div></header>
-<div id="hud" aria-label="마을의 현재 지표"></div>
-<div class="quest"><strong id="objective"></strong><span id="badges"></span><span id="progress" aria-label="스토리 진행도"></span></div>
-<div id="stage" tabindex="0" aria-label="방향키로 이동합니다. NPC 바로 옆에서 Enter로 말을 겁니다.">
-<canvas id="world" width="768" height="480" aria-label="24×15 타일 미래마을 지도"></canvas>
-<div id="maplabel"></div><div id="hint" aria-live="polite"></div>
+<header class="game-header"><div><span class="tag">FUTURE VILLAGE · CHAPTER RPG</span><h1 id="place">미래마을에 도착하는 중...</h1></div><div class="age-token"><span id="period">나의 여정</span><b id="age">15세</b></div></header>
+<div class="quest"><div class="quest-caption">✦ 지금 해야 할 일 <span id="progress">0% 진행</span></div><strong id="objective">주민을 만나 봐요.</strong><div class="quest-sub"><span id="badges"></span><span id="world-phase"></span></div></div>
+<div id="stage" tabindex="0" aria-label="탑다운 픽셀 RPG 지도. 방향키나 WASD로 이동하고 Enter로 대화, 스페이스로 현장을 조사합니다.">
+<canvas id="world" width="768" height="480" aria-label="직접 탐험하는 24×15 타일 픽셀 미래마을 지도"></canvas>
+<div id="maplabel">← → 방향키 · Enter 대화 · Space 조사</div><div id="route" aria-live="off"></div><div id="hint" aria-live="polite"></div>
+<div id="timeline" class="hidden" aria-live="polite"><div class="timeline-card"><span>THE YEARS PASS</span><b id="timeline-title"></b><p id="timeline-desc"></p><button id="skiptravel">건너뛰기</button></div></div>
 <div id="modal" class="hidden" role="dialog" aria-modal="true" aria-labelledby="dialogtitle"><section id="dialog"></section></div>
 </div>
-<div id="controls"><div class="pad" aria-label="이동 방향 버튼">
-<button data-dir="up" class="up" aria-label="위로 이동합니다.">▲</button><button data-dir="left" class="left" aria-label="왼쪽으로 이동합니다.">◀</button><button data-dir="down" class="down" aria-label="아래로 이동합니다.">▼</button><button data-dir="right" class="right" aria-label="오른쪽으로 이동합니다.">▶</button>
-</div><div class="actions"><button id="talk" class="primary">말걸기 · Enter</button><button id="book">지식 도감</button><button id="life">생애설계 카드</button><button id="classroom">20분 수업 모드</button><button id="policy">정책카드</button><button id="save">저장합니다.</button><button id="sound">소리를 켭니다.</button><button id="full">화면을 확대합니다.</button></div></div>
-<footer id="status" aria-live="polite">방향키 또는 화면의 방향버튼으로 움직여요. 빛나는 포탈에 들어가면 다른 구역으로 이동해요.</footer>
+<div id="controls"><div class="pad" aria-label="이동 방향 버튼"><button data-dir="up" class="up" aria-label="위">▲</button><button data-dir="left" class="left" aria-label="왼쪽">◀</button><button data-dir="down" class="down" aria-label="아래">▼</button><button data-dir="right" class="right" aria-label="오른쪽">▶</button></div>
+<div class="actions"><button id="talk" class="primary action-main">💬 말걸기</button><button id="inspect" class="investigate action-main">🔎 조사하기</button><button id="life">📜 생애설계</button><button id="policy">🏛 정책회의</button><button id="book">📖 도감</button><button id="classroom">20분 모드</button><button id="save">저장</button><button id="sound">🔇 소리</button><button id="full">⛶ 전체화면</button></div></div>
+<details class="stats-panel"><summary>마을 수치와 탐험 기록 보기 <span class="simulation">교육용 가상 시뮬레이션</span></summary><div id="hud" aria-label="마을의 현재 지표"></div></details>
+<footer id="status" aria-live="polite">방향키로 이동하고 반짝이는 단서를 살펴보세요.</footer>
 </main><script src="game.js"></script></body></html>

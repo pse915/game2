@@ -1,7 +1,7 @@
 """화면이나 네트워크에 의존하지 않는 게임 규칙입니다."""
 import copy, hashlib, secrets, time, uuid, math
 from collections import deque
-from content import CHAPTERS, NPCS, MAPS, QUIZZES, CHECKLIST, ENDING, KNOWLEDGE, NOTICE
+from content import CHAPTERS, NPCS, MAPS, QUIZZES, CHECKLIST, ENDING, KNOWLEDGE, NOTICE, EVENTS
 SCHEMA = 1
 NPC = {n['id']:n for n in NPCS}
 
@@ -143,8 +143,9 @@ def apply_choice(s,code):
     response=n['after'].get(str(ch)+code,'다음 세대와 함께 미래를 준비해요.')
     if s['flags'].get('classroom_mode'):
         response+=' '+LESSONS[ch]
-    if ch==3:response+=' '+('학교 유지 불빛이 켜졌어요.' if s['stats']['village_tfr']>=1.0 else '학교의 불빛이 꺼졌어요. 이는 가상 모형의 연출이지 개인에 대한 책임 판정이 아니에요.')
-    return dict(type='notice',title='선택이 마을에 반영되었어요.',text=response,lines=extra,next=objective(s))
+    if ch==3:response+=' 개인 자녀 수가 마을 전체의 미래를 결정하지는 않아요. 주거·일자리·돌봄 정책을 함께 살펴봐요.'
+    return dict(type='notice',title='시간이 흐르고 마을이 달라집니다',text=response,lines=extra,
+      next=objective(s),travel={'from':CHAPTERS[ch]['age'],'to':s['age'],'chapter':ch+1},sparkle=True)
 
 LESSONS = [
  '가족 친화 문화는 서로 다른 삶과 가족을 존중합니다.',
@@ -164,13 +165,46 @@ def life_card(s):
       'retirement':{name:('점검함' if key in s['checklist'] else '앞으로 준비할 영역') for key,name in zip(CHECKLIST,areas)},
       'values':chapters.get(0,'다양한 삶을 존중하기'),
       'policies':policies,'next_step':'나에게 중요한 영역을 골라 현실적인 첫 걸음을 적어 보세요.',
-      'reality':'게임 수치와 인생 선택은 학습용 가정이며 실제 삶의 결과를 예측하지 않습니다.'}
+      'reality':'게임의 미래는 교육용 가상 시나리오입니다. 실제 인생과 사회 변화를 예측하지 않습니다.',
+      'incidents':[EVENT[k]['title'] for k in s['flags'].get('investigations',{}) if k in EVENT],
+      'policy_effects':world_view(s) if 'world_view' in globals() else {},
+      'important_choice':s['history'][-1]['label'] if s['history'] else '아직 선택하지 않음'}
+
+EVENT = {item['id']:item for item in EVENTS}
+
+
+def world_view(s):
+    # 저장 데이터를 건드리지 않는 파생 월드 상태 (가상 시나리오)
+    flags=s['flags']; policies=flags.get('policy_choices',[])
+    stage='spring' if s['age']<29 else 'summer' if s['age']<58 else 'autumn'
+    return {'season':stage, 'age':s['age'],
+      'shop':'reviving' if 'housing' in policies else ('hope' if flags.get('investigations',{}).get('closed_shop') else 'quiet'),
+      'nursery':'supported' if 'flex' in policies else ('listening' if flags.get('investigations',{}).get('empty_classroom') else 'quiet'),
+      'elder':'connected' if 'elder' in policies else ('heard' if flags.get('investigations',{}).get('elder_letter') else 'alone'),
+      'housing':'welcoming' if 'housing' in policies else 'waiting',
+      'work':'balanced' if 'flex' in policies else 'strained',
+      'policy_count':len(policies),
+      'discoveries':list(flags.get('investigations',{})),
+      'education_model':True}
+
+
+def event_ui(s,item):
+    return {'type':'event','event_id':item['id'],'title':item['title'],
+      'text':item['summary'], 'prompt':item['prompt'],
+      'options':item['answers'], 'lesson':item['lesson'],
+      'previous':s['flags'].get('investigations',{}).get(item['id'])}
 
 def objective(s):
     if s['finished']:return '엔딩을 확인하고 수업 성찰을 기록하세요.'
     if s['chapter']>=6:return '실버타운의 온유 미래시장에게 말을 걸어 65세 엔딩을 확인하세요.'
     n=NPC[CHAPTERS[s['chapter']]['guide']]
+    # 조사 이벤트는 탐험을 유도하되 강제 잠금하지 않습니다.
+    focus={1:'job_board',2:'closed_shop',3:'empty_classroom',4:'work_schedule',5:'elder_letter'}.get(s['chapter'])
+    if s['flags'].get('classroom_mode') and focus and focus not in s['flags'].get('investigations',{}):
+        event=EVENT[focus]
+        return f"현장 사건 · {event['title']} 살펴보기 ({MAPS[event['zone']]['name']})"
     return f"{s['chapter']+1}/6 · {n['name']} 만나기 ({MAPS[n['zone']]['name']})"
+
 
 def talk_ui(s,npc_id):
     n=NPC[npc_id]
@@ -202,6 +236,24 @@ def handle(state,event):
         if not near(s,nid):raise ValueError('NPC 바로 옆에서 말을 걸어 주세요.')
         if nid not in s['visited']:s['visited'].append(nid)
         ui=talk_ui(s,nid)
+    elif kind in ('investigate','resolve_event'):
+        item=EVENT.get(event.get('event_id'))
+        if not item:raise ValueError('없는 사건이에요.')
+        if item['zone']!=s['zone'] or abs(item['x']-s['x'])+abs(item['y']-s['y'])>1:
+            raise ValueError('현장 표시 바로 옆에서 조사해 주세요.')
+        if kind=='investigate':
+            ui=event_ui(s,item)
+        else:
+            option=next((answer for answer in item['answers'] if answer['code']==event.get('code')),None)
+            if not option:raise ValueError('해결 방법을 골라 주세요.')
+            record=s['flags'].setdefault('investigations',{})
+            if item['id'] not in record:
+                record[item['id']]=option['code']
+                concepts=s['flags'].setdefault('experience_concepts',[])
+                if item['concept'] not in concepts:concepts.append(item['concept'])
+            ui={'type':'notice','title':'마을의 단서를 발견했어요!','text':option['reply'],
+                'lines':[item['lesson'],'마을의 반응을 살펴보고 다음 주민을 만나 보세요.'],
+                'next':objective(s),'sparkle':True}
     elif kind=='classroom':
         s['flags']['classroom_mode']=True
         s['flags']['informed']=True
@@ -252,7 +304,7 @@ def handle(state,event):
         if key in selected:raise ValueError('이미 실행한 정책입니다.')
         if len(selected)>=2:raise ValueError('마을 예산으로는 두 정책까지만 선택할 수 있어요.')
         selected.append(key);name,effects=options[key];apply_effects(s,effects);s['flags']['informed']=True
-        ui={'type':'notice','title':'마을 정책이 바뀌었어요!','text':name+' 정책을 실행했습니다. 한정된 예산 때문에 다른 지원의 우선순위도 함께 고민해 보세요.'}
+        ui={'type':'notice','title':'마을에 실제 변화가 생겼어요!','text':name+' 정책을 실행했습니다. 관련 시설과 주민들의 모습이 달라집니다. 남아 있는 과제도 찾아보세요.', 'sparkle':True}
     elif kind=='policy_menu':
         if not s['flags'].get('policy_offer'):raise ValueError('어린이집 이야기를 먼저 진행하세요.')
         ui={'type':'policy_menu','title':'미래마을 정책 회의','text':'마을 예산으로 세 정책 중 두 개까지 고를 수 있어요. 각 정책에는 혜택과 예산의 한계가 있습니다.', 'selected':s['flags'].get('policy_choices',[])}
@@ -275,12 +327,23 @@ def handle(state,event):
 
 def public_state(s):
     data={k:copy.deepcopy(v) for k,v in s.items() if not k.startswith('_')}
-    data['objective']=objective(s);data['bonus_items']=bonuses(s);data['life_card']=life_card(s);data['progress']=round(100*s['chapter']/6)
+    data['objective']=objective(s);data['bonus_items']=bonuses(s);data['life_card']=life_card(s);data['progress']=round(100*s['chapter']/6);data['world_view']=world_view(s)
     if s['finished']:
         code=ending_code(s);delta,tfr=score(s)
         data['ending_info']={**ENDING[code],'code':code,'delta':delta,'tfr':tfr,
           'message':f'당신의 선택이 합계출산율을 {delta:+.2f}만큼 '+('올렸습니다.' if delta>=0 else '내렸습니다.')+f' 최종 TFR {tfr:.2f}'}
     return data
+
+def student_digest(s):
+    """교사 확인용 읽기 전용 요약; 기존 results/로그 헤더는 변경하지 않습니다."""
+    card=life_card(s)
+    return {'반':s['class_code'],'학번':s['student_id'],'별명':s['nickname'],
+      '진행':f"{s['chapter']}/6",'완료':('완료' if s['finished'] else '진행 중'),
+      '청년기 선택':card['youth'],'관계 선택':card['relationships'],
+      '일과 돌봄':card['balance'],'선택한 정책':', '.join(card['policies']) or '미선택',
+      '조사한 사건':', '.join(card['incidents']) or '없음',
+      '노후 준비':', '.join(CHECKLIST[k].split(':')[0] for k in s['checklist']),
+      '엔딩':s.get('ending','')}
 
 def validate_state(s):
     if not isinstance(s,dict) or s.get('schema')!=SCHEMA:raise ValueError('지원하지 않는 저장파일이에요.')

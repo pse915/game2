@@ -4,8 +4,8 @@ from pathlib import Path
 import pandas as pd
 import streamlit as st
 from component import game
-from content import TITLE, SUBTITLE, NOTICE, SOURCE, CHAPTERS, NPCS, MAPS, ENDING
-from engine import new_state, verify_pin, handle, public_state, validate_state, score, objective
+from content import TITLE, SUBTITLE, NOTICE, SOURCE, CHAPTERS, NPCS, MAPS, ENDING, EVENTS
+from engine import new_state, verify_pin, handle, public_state, validate_state, score, objective, student_digest
 from storage import Store
 # ===== 시트 주소 설정 (app.py 안에 직접 넣기) =====
 # 방법 1: 아래 SHEET_ID에 시트 ID만 넣으세요. 예: "1AbCdEfGhIjKlMnOpQrStUvWx"
@@ -63,6 +63,21 @@ def teacher_panel():
         except RuntimeError as e:st.error(str(e))
     if c3.button('교사 화면에서 로그아웃합니다.'):
         st.session_state.teacher_ok=False;st.rerun()
+    # logs에는 미완료 학생도 포함되므로 결과 시트 스키마 변경 없이 수업 상황을 확인합니다.
+    recent={}
+    for record in store.logs():
+        try:
+            st_data=validate_state(json.loads(record['state_json']))
+            recent[(st_data['class_code'],st_data['student_id'])]=student_digest(st_data)
+        except (ValueError,KeyError,TypeError):continue
+    if recent:
+        st.subheader('학생별 스토리 진행과 생애설계 기록')
+        st.caption('기존 logs의 최신 저장 기록을 읽습니다. 진행 중 학생도 표시됩니다. 기록 저장은 기존 방식 그대로입니다.')
+        progress_df=pd.DataFrame(recent.values())
+        selected_class=st.selectbox('진행 현황 반 선택',['전체 반']+sorted(progress_df['반'].unique().tolist()),key='progress_class')
+        if selected_class!='전체 반':progress_df=progress_df[progress_df['반']==selected_class]
+        st.dataframe(progress_df,hide_index=True,use_container_width=True)
+        st.download_button('학급 진행·생애설계 요약 CSV',progress_df.to_csv(index=False).encode('utf-8-sig'),'생애설계_학급요약.csv','text/csv')
     rows=store.results()
     if store.error:st.warning(store.error)
     if not rows:st.info('아직 저장된 엔딩이 없어요. 미완료 학생은 평균에 포함하지 않습니다.');return
@@ -133,7 +148,7 @@ if 'state' not in st.session_state:
     st.caption('키 설정 없이도 체험할 수 있지만 로컬 CSV는 영구 저장소가 아닙니다. 정규 수업에서는 Google Sheets 연결을 권장합니다.')
     st.stop()
 s=st.session_state.state
-payload={'state':public_state(s),'maps':MAPS,'npcs':NPCS,'chapters':CHAPTERS,'notice':NOTICE,'ui':st.session_state.get('ui'),'save_status':st.session_state.get('save_status','')}
+payload={'state':public_state(s),'maps':MAPS,'events':EVENTS,'npcs':NPCS,'chapters':CHAPTERS,'notice':NOTICE,'ui':st.session_state.get('ui'),'save_status':st.session_state.get('save_status','')}
 event=game(payload,key='village_'+s['run_id'])
 if isinstance(event,dict) and event.get('id') and event['id']!=st.session_state.get('last_event'):
     st.session_state.last_event=event['id']

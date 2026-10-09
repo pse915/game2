@@ -32,7 +32,7 @@
   const lc = (...parts)=>parts.filter(Boolean).join(' ');
   function sound(note=520){if(!audio)return;try{audioContext??=new(window.AudioContext||window.webkitAudioContext)();const o=audioContext.createOscillator(),g=audioContext.createGain();o.type='square';o.frequency.setValueAtTime(note,audioContext.currentTime);o.frequency.exponentialRampToValueAtTime(note*.7,audioContext.currentTime+.09);g.gain.setValueAtTime(.04,audioContext.currentTime);g.gain.exponentialRampToValueAtTime(.001,audioContext.currentTime+.12);o.connect(g).connect(audioContext.destination);o.start();o.stop(audioContext.currentTime+.13)}catch(e){}}
   function zoneInfo(){return data?.zones.find(z=>z.id===pos.zone)}
-  function readSavedPosition(){try{const p=JSON.parse(sessionStorage.getItem('sewol_location:'+state.run_id+':'+state.stage));if(p&&(data.zones.some(z=>z.id===p.zone)||isSchoolZone(p.zone)&&(!p.zone.startsWith("school:room:")||schoolRoomData(p.zone.substring(12))))&&Number.isInteger(p.x)&&Number.isInteger(p.y)&&p.x>=1&&p.x<29&&p.y>=8&&p.y<18&&!obstacle(p.zone,p.x,p.y))return p;}catch(e){}return null}
+  function readSavedPosition(){try{const p=JSON.parse(sessionStorage.getItem('sewol_location:'+state.run_id+':'+state.stage));if(p&&(data.zones.some(z=>z.id===p.zone)||isSchoolZone(p.zone)&&(!p.zone.startsWith("school:room:")||schoolRoomData(p.zone.substring(12))))&&Number.isInteger(p.x)&&Number.isInteger(p.y)&&p.x>=1&&p.x<29&&p.y>=4&&p.y<18&&!obstacle(p.zone,p.x,p.y))return p;}catch(e){}return null}
   function rememberPosition(){if(!state)return;try{sessionStorage.setItem('sewol_location:'+state.run_id+':'+state.stage,JSON.stringify({zone:pos.zone,x:pos.x,y:pos.y,dir:pos.dir}));}catch(e){}}
   function updateFromPython(args){
     if(!args?.state||!args?.content)return;
@@ -101,7 +101,7 @@
   function warp(zone){if(!data.zones.some(z=>z.id===zone))return;pos={zone,x:16,y:13,prevX:16,prevY:13,dir:'down',moving:false,moveTime:0};mapKey='';rememberPosition();refreshUI();showToast(data.zones.find(z=>z.id===zone).name+'에 도착했어요.');sound(620);}
   function showJournal(){const arr=state.journal||[],recordCount=Object.keys(state.school_records||{}).length+Object.keys(state.building_records||{}).length,unseen=Object.entries(data.concepts).filter(([k])=>!state.concepts.includes(k)),memory=arr.slice(-12).reverse().map(j=>`<li><b>${j.age}세 · ${safe(j.title)}</b><div>${safe(j.choice)} — ${safe(j.outcome)}</div></li>`).join('');showModal('나의 생애 노트',`경험한 교과서 주제 ${state.concepts.length}/${Object.keys(data.concepts).length} · 마을 사건 ${Object.keys(state.decisions).length}개 · 학교/건물 조사 ${recordCount}개`,`<div class="two-column"><div><b>나의 선택</b><ul>${memory||'<li>아직 기록이 없어요.</li>'}</ul></div><div><b>발견한 내용</b><ul>${state.concepts.map(k=>'<li>'+safe(data.concepts[k])+'</li>').join('')||'<li>주민과 이야기해 보세요.</li>'}</ul><hr class="divider"><b>아직 찾지 못한 단서</b><p>${unseen.length}개 남았습니다. 모든 단서를 다 찾아야 엔딩을 볼 수 있는 것은 아닙니다.</p></div></div>`,r=>actions(r,[['하루 시간표 미니게임',showSchedule],['닫기',closeModal]]));}
   function showSchedule(){const activities=['일','휴식','돌봄','여가'];let picks=[];function present(){const content=`<p>오늘 자유롭게 쓸 수 있는 시간은 <b>세 칸</b>입니다. 어떤 활동을 선택하시겠어요? 모두 필요하지만 한 번에 전부 할 수는 없습니다.</p><div class="options two-column">${activities.map(x=>`<button data-act="${x}">${x} ${picks.filter(y=>y===x).length?'✓':''}</button>`).join('')}</div><p><b>시간표: </b>${picks.length?picks.join(' → '):'아직 선택하지 않음'} (${picks.length}/3)</p>`;showModal('하루 시간 조율', '',content,r=>{r.querySelectorAll('[data-act]').forEach(b=>b.addEventListener('click',()=>{if(picks.length<3){picks.push(b.dataset.act);present()}}));actions(r,[['처음부터',()=>{picks=[];present()}],['선택 마무리',()=>{if(picks.length<3){showToast('세 칸을 채워 보세요.');return;}const omitted=activities.filter(a=>!picks.includes(a));closeModal();showModal('선택의 결과',`당신은 ${picks.join('·')}을(를) 골랐어요. 남은 ${omitted.join('·')||'활동'}에도 시간과 지원이 필요할 수 있습니다. 사람마다 중요한 것이 다릅니다.`,'<blockquote>일·가정 양립은 개인의 계획뿐 아니라 직장과 지역사회의 제도가 함께 뒷받침해야 합니다.</blockquote>',r2=>actions(r2,[['마을로',closeModal]]));}]]);});}present();}
-  function refreshUI(){if(!state||!data)return;const zone=zoneInfo();const indoor=pos.zone.startsWith('inside:')||isSchoolZone(pos.zone);$('zone-label').innerHTML=`<span class="mini-sun">☀</span> ${safe(isSchoolZone(pos.zone)?(schoolRoom()?schoolRoomData(schoolRoom())?.name+' · '+schoolLevel()+'층':'서라벌여중 '+schoolLevel()+'층 복도'):(indoor?(pos.building?.[4]||'실내'):zone?.name||'마을'))}`;
+  function refreshUI(){if(!state||!data)return;const zone=zoneInfo();const indoor=pos.zone.startsWith('inside:')||isSchoolZone(pos.zone);$('zone-label').innerHTML=`<span class="mini-sun">☀</span> ${safe(isSchoolZone(pos.zone)?(schoolRoom()?'서라벌여중 · '+schoolLevel()+'층 · '+schoolRoomData(schoolRoom())?.name:'서라벌여중 · '+schoolLevel()+'층 ㄱ자 복도'):(indoor?(pos.building?.[4]||'실내'):zone?.name||'마을'))}`;
     $('stage-pill').textContent='✧ '+data.stages[state.stage];$('age-pill').textContent=state.age+'세';$('stat-pill').textContent='✦ 관계 '+state.stats.bond;$('season').textContent=['봄','가을','겨울'][state.stage];$('ambient-label').textContent=['☀ 햇살 좋은 오후','❖ 계절이 깊어지는 거리','❄ 긴 시간이 흐른 마을'][state.stage];
     const titles=['어떤 어른이 될까?','함께 살아가는 방법','내 삶을 돌아보는 시간'];const descriptions=['일터지구의 선우, 주거지의 미라와 만나 직업·주거를 직접 선택해 보세요.','돌봄공원의 연주와 중앙광장의 하린을 만나 마을 문제와 정책을 연결해 보세요.','돌봄공원의 유진·태오, 강가의 유리, 광장의 수아에게서 노후 준비 네 분야를 경험하세요.'];
     $('task-title').textContent=state.ended?'완성된 이야기, 새로운 탐험':titles[state.stage];$('task-desc').textContent=state.ended?'생애설계 카드를 완성했습니다. 이제 세대 협력·정원·축제 등 남은 사건을 자유롭게 경험해 보세요.':descriptions[state.stage];const need=data.requirements[state.stage];let done=need.filter(k=>state.decisions[k]).length;$('req-count').textContent=done+' / '+need.length+' 필수 사건';$('learn-count').textContent='학습 단서 '+state.concepts.length+'개';$('progress-bar').style.width=(100*done/need.length)+'%';const next=$('next-stage');next.disabled=done!==need.length||state.ended;next.innerHTML=state.ended?'생애설계 완성 ✦':state.stage===2?'생애설계 카드 완성 <span>✦</span>':'다음 생애로 이동하기 <span>↗</span>';
@@ -109,7 +109,7 @@
     $('memory-content').innerHTML=state.journal.length?state.journal.slice(-3).reverse().map(j=>`<div class="memory-line"><i>${j.age}세</i>${safe(j.choice)}</div>`).join(''):'<div class="empty-memory">첫 선택이 곧 나의 이야기가 됩니다.</div>';
     $('reflect-prompt').textContent=['나는 어떤 삶을 중요하게 생각할까?','가족 친화 문화는 누가 함께 만들까?','건강·여가·재무·관계를 어떻게 준비할까?'][state.stage];
   }
-  function obstacle(zone,x,y){if(x<0||x>=MW||y<0||y>=MH)return true;if(isSchoolZone(zone))return x<1||x>28||y<4||y>17;if(zone.startsWith('inside:'))return y<3||y>=18||x<2||x>=28;
+  function obstacle(zone,x,y){if(x<0||x>=MW||y<0||y>=MH)return true;if(isSchoolZone(zone)){if(zone.startsWith('school:hall:'))return !((x>=6&&x<=8&&y>=8&&y<=17)||(x>=7&&x<=27&&y>=8&&y<=10));return x<1||x>28||y<4||y>17;}if(zone.startsWith('inside:'))return y<3||y>=18||x<2||x>=28;
     for(const b of data.buildings[zone]||[]){if(x>=b[0]&&x<b[0]+b[2]&&y>=b[1]&&y<b[1]+b[3])return true}
     if(zone==='river'&&x>=25&&(y<10||y>14))return true;
     if(zone==='square'&&x>=14&&x<=17&&y>=9&&y<=11)return true;
@@ -154,7 +154,7 @@
     for(let x=0;x<MW;x++)if((x+z.length)%9===0){rect(c,x*TILE+4,17*TILE+12,14,2,'#638f76')}
   }
   function drawBuilding(c,b,z){const [x,y,w,h,name,type]=b,X=x*TILE,Y=y*TILE,WW=w*TILE,HH=h*TILE,doorX=X+Math.floor(w/2)*TILE;
-    if(type==='school'&&art.school_exterior.complete&&art.school_exterior.naturalWidth){c.drawImage(art.school_exterior,X,Y,WW,HH);c.font='bold 13px sans-serif';c.textAlign='center';c.textBaseline='middle';rect(c,X+93,Y+17,138,20,'#3d5f59');c.fillStyle='#f8e9c7';c.fillText('서라벌여자중학교',X+WW/2,Y+27);return;}
+    if(type==='school'&&art.school_exterior.complete&&art.school_exterior.naturalWidth){c.drawImage(art.school_exterior,X,Y,WW,HH);c.font='bold 13px sans-serif';c.textAlign='center';c.textBaseline='middle';rect(c,X+WW*.25,Y+13,WW*.5,23,'#3d5f59');c.fillStyle='#f8e9c7';c.fillText('서라벌여중',X+WW/2,Y+27);return;}
     let roof={'school':'#b97760','hall':'#508777','clinic':'#7b9daf','cafe':'#ca8662','theater':'#986c8e','closed':'#757d7c','factory':'#7e8da1','office':'#8b9288','library':'#847fa3','care':'#8f9fb8','house':'#c49076','home':'#b78973','bread':'#cf9d63'}[type]||'#a98270';
     if(type==='closed'&&state.flags.policy==='청년 지원')roof='#639382';
     rect(c,X+1,Y+13,WW,HH-1,'#263f42');rect(c,X+4,Y+20,WW-9,HH-20,'#e8d7b2');rect(c,X+9,Y+29,WW-18,HH-32,'#d4c6a9');
@@ -182,69 +182,92 @@
   function drawPerson(c,who,x,y,dir='down',frame=0,old=false){rect(c,x-11,y+4,24,5,'#28413b88');c.drawImage(sprite(who,dir,frame,old),Math.round(x-15),Math.round(y-44),30,47)}
   function nameLabel(c,x,y,text,active){c.textAlign='center';c.font='bold 12px sans-serif';const bw=Math.max(40,Math.min(150,c.measureText(text).width+16));rect(c,x-bw/2,y-61,bw,19,active?'#2e5260':'#243a3e');rect(c,x-bw/2,y-61,bw,2,active?'#edc486':'#759893');c.fillStyle=active?'#f9e5af':'#e9e7d1';c.textBaseline='middle';c.fillText(text,x,y-51);if(active){rect(c,x-6,y-86,13,17,'#f4c67b');c.fillStyle='#634b30';c.font='bold 12px sans-serif';c.fillText('!',x,y-77)}}
 
-  function setSchoolPosition(zone,x,y){pos={zone,x,y,prevX:x,prevY:y,dir:'down',moveTime:0,moving:false};mapKey='';stopAll();rememberPosition();refreshUI();}
-  function enterSchoolHall(f){setSchoolPosition('school:hall:'+f,15,13);showToast('서라벌여중 '+f+'층입니다. 문이나 계단 가까이서 조사하세요.');}
-  function enterSchoolRoom(id){const room=schoolRoomData(id);if(!room)return;setSchoolPosition('school:room:'+id,15,16);showToast(room.name+' · 반짝이는 물건에 다가가 조사하세요.');}
-  function leaveSchoolRoom(){const level=schoolLevel();setSchoolPosition('school:hall:'+level,15,12);}
-  function leaveSchool(){setSchoolPosition('square',7,9);showToast('학교를 나왔어요. 미래마을은 언제든 탐험할 수 있어요.');}
+  const schoolStairs=()=>data?.school?.stairs||{west:[8,17],east:[27,10]};
+  const hallDoor=(roomId)=>schoolRoomData(roomId)?.door||[15,9];
+  const schoolDist=(a,b)=>Math.abs(a[0]-b[0])+Math.abs(a[1]-b[1]);
+  function nearestSchoolDoor(){return roomsFor(schoolLevel()).map(r=>({...r,d:schoolDist([pos.x,pos.y],r.door)})).sort((a,b)=>a.d-b.d)[0]||null;}
+  function setSchoolPosition(zone,x,y){pos={zone,x,y,prevX:x,prevY:y,dir:'down',moveTime:0,moving:false};routeMemo={};mapKey='';stopAll();rememberPosition();refreshUI();}
+  function enterSchoolHall(f,at=null){const landing=at||data?.school?.entry||[15,9];setSchoolPosition('school:hall:'+f,landing[0],landing[1]);showToast('서라벌여중 '+f+'층 · ㄱ자 복도에서 문패를 살펴보세요.');}
+  function enterSchoolRoom(id){const room=schoolRoomData(id);if(!room)return;setSchoolPosition('school:room:'+id,15,16);showToast(room.name+' · 물건에 가까이 가서 조사하세요.');}
+  function leaveSchoolRoom(){const room=schoolRoomData(schoolRoom());if(!room)return;enterSchoolHall(room.floor_id,room.door);}
+  function leaveSchool(){setSchoolPosition('square',7,9);showToast('학교 밖 미래마을로 나왔어요.');}
   function schoolStaircase(){const f=schoolLevel(),opts=[];
-    for(let level=1;level<=4;level++)if(level!==f)opts.push([level+'층으로 이동',()=>{closeModal();enterSchoolHall(level)}]);
+    const at=Object.values(schoolStairs()).find(pt=>schoolDist(pt,[pos.x,pos.y])<=2)||schoolStairs().west;
+    for(let level=1;level<=4;level++)if(level!==f)opts.push([level+'층으로 이동',()=>{closeModal();enterSchoolHall(level,at)}]);
     if(f===1)opts.push(['학교 밖으로',()=>{closeModal();leaveSchool()}]);
     opts.push(['여기서 계속 탐험',closeModal]);
-    showModal('서라벌여중 층별 이동','학교 계단을 통해 원하는 층으로 이동할 수 있어요.','',root=>actions(root,opts));
+    showModal('서라벌여중 · 계단',f+'층에서 이동할 층을 선택하세요.','',root=>actions(root,opts));
   }
   function schoolObjects(){const room=schoolRoomData(schoolRoom());if(!room)return[];
     return (room.kind==='class'?['teacher','board','bulletin','desk','locker']:['board','desk','locker']).map(id=>({id,label:data.school.objects[id],point:data.school.points[id]}));
   }
   function schoolInteract(){const room=schoolRoom();if(!room){
-      if((pos.x<=4||pos.x>=25)&&pos.y>=9){schoolStaircase();return;}
-      if(pos.y>=16&&pos.x>=12&&pos.x<=18){if(schoolLevel()===1){showModal('학교 정문','마을로 나가면 청년기부터 노년기까지 생애설계 모험이 이어집니다.','',r=>actions(r,[['마을로',()=>{closeModal();leaveSchool()}],['복도 계속 보기',closeModal]]));}else{showModal('중앙 복도','정문은 1층에 있습니다. 계단을 이용하거나 안내도로 이동하세요.','',r=>actions(r,[['1층 중앙현관으로',()=>{closeModal();enterSchoolHall(1)}],['복도 계속 보기',closeModal]]));}return;}
-      const rooms=roomsFor(schoolLevel());const found=rooms.find((r,i)=>Math.abs(pos.x-(3+4*i))<=1&&pos.y<=9);
-      if(found){enterSchoolRoom(found.id);return;}
-      showToast('교실 문(위쪽), 계단(양쪽) 또는 1층 출입구(아래)에 다가가세요.');return;
+      if(Object.values(schoolStairs()).some(p=>schoolDist([pos.x,pos.y],p)<=1)){schoolStaircase();return;}
+      const closest=nearestSchoolDoor();
+      if(closest&&closest.d<=1){enterSchoolRoom(closest.id);return;}
+      if(schoolLevel()===1&&schoolDist([pos.x,pos.y],data.school.entry||[15,9])<=1){
+        showModal('서라벌여중 · 중앙현관','학교 밖으로 나가면 미래마을에서 생애설계를 계속할 수 있습니다.','',r=>actions(r,[['마을로 나가기',()=>{closeModal();leaveSchool()}],['학교에 남기',closeModal]]));return;
+      }
+      showToast('문패 앞에서 말 걸기 · 계단에서 층 이동 · 학교 안내도에서 길 찾기');return;
     }
     if(pos.y>=16&&pos.x>=12&&pos.x<=18){leaveSchoolRoom();return;}
     const objects=schoolObjects(),nearest=objects.map(o=>({...o,d:Math.abs(pos.x-o.point[0])+Math.abs(pos.y-o.point[1])})).sort((a,b)=>a.d-b.d)[0];
-    if(!nearest||nearest.d>3){showToast('선생님이나 반짝이는 교실 물건 가까이 이동해 조사하세요.');return;}
+    if(!nearest||nearest.d>3){showToast('반짝이는 물건이나 교사 NPC에 다가가서 조사하세요.');return;}
     const item=schoolRoomData(room),teacher=data.school.teachers[room],special=data.school.special[room],done=!!(state.school_records||{})[room+':'+nearest.id];
-    const intro=nearest.id==='teacher'?teacher?.prompt:(nearest.id==='board'?(teacher?.prompt||special?.prompt):nearest.id==='bulletin'?'게시판에 다양한 삶을 존중하는 학교 캠페인이 붙어 있어요.':nearest.id==='desk'?'나의 시간·경제·관계에서 우선순위를 고르는 연습장입니다.':'미래의 나에게 필요한 정보를 모으는 자료함입니다.');
+    const intros={board:'오늘의 학습 주제를 보고 원인과 해결 방안을 연결해 보세요.',bulletin:'서로 다른 삶을 존중하는 학생들의 의견이 게시되어 있어요.',desk:'일·휴식·건강·관계 중 오늘 무엇부터 실천할지 떠올려 보세요.',locker:'과거 통계와 미래 상황을 구분하여 자료를 모아 보세요.'};
+    const intro=nearest.id==='teacher'?teacher?.prompt:(teacher?.prompt||special?.prompt||'나와 사회의 미래를 생각해 봐요.')+' '+(intros[nearest.id]||'');
     const title=nearest.id==='teacher'?`${teacher.name} 선생님 · ${teacher.subject}`:`${item.name} · ${nearest.label}`;
-    showModal(title,'※ 게임용 가상 대사·활동이며 실제 선생님의 발언을 재현한 것이 아닙니다.',`<p>${safe(intro)}</p><p class="option-note">${done?'이미 다이어리에 기록된 활동입니다.':'둘 중 나에게 더 필요한 탐색 방법을 선택해 기록해 보세요.'}</p>`,r=>{
-       const opts=done?[['닫기',closeModal]]:[['직접 조사하고 미래 계획에 반영하기',()=>{emit({type:'school_activity',room_id:room,object_id:nearest.id,choice_id:'investigate'});closeModal();}],['다른 사람의 생각도 비교해 보기',()=>{emit({type:'school_activity',room_id:room,object_id:nearest.id,choice_id:'discuss'});closeModal();}],['나중에 조사',closeModal]];
+    showModal(title,'※ 학교 NPC의 대사와 활동은 수업용 창작이며 실제 교사의 발언이 아닙니다.',`<p>${safe(intro)}</p><p class="option-note">${done?'기록을 완료한 활동입니다.':'선택에 정답은 없습니다. 내가 중요하게 생각하는 이유를 돌아보세요.'}</p>`,r=>{
+       const opts=done?[['닫기',closeModal]]:[['직접 조사하고 계획에 반영하기',()=>{emit({type:'school_activity',room_id:room,object_id:nearest.id,choice_id:'investigate'});closeModal();}],['다른 사람의 의견도 비교해 보기',()=>{emit({type:'school_activity',room_id:room,object_id:nearest.id,choice_id:'discuss'});closeModal();}],['나중에 조사',closeModal]];
        actions(r,opts);
     });
   }
-  function showSchoolDirectory(){const school=data.school;const rows=Object.keys(school.floors).map(f=>`<section class="floor-group"><b>${f}층</b><div class="floor-buttons">${school.floors[f].map(r=>`<button data-room="${r.id}" data-floor="${f}">${safe(r.name)}${school.teachers[r.id]?' · '+safe(school.teachers[r.id].name):''}</button>`).join('')}</div></section>`).join('');
-    showModal('서라벌여중 학교 안내도','탐험할 교실을 선택하면 현재 위치에서 목표로 안내합니다. 교실은 자유롭게 방문할 수 있어요.',`<div class="school-directory">${rows}</div>`,r=>{
-      r.querySelectorAll('[data-room]').forEach(b=>b.addEventListener('click',()=>{schoolGoal={floor:Number(b.dataset.floor),room:b.dataset.room};closeModal();showToast('안내 시작: '+schoolRoomData(schoolGoal.room).name+' · 화살표를 따라가세요.')}));
-      actions(r,[['현재 층의 위치로 이동',()=>{closeModal();enterSchoolHall(schoolLevel());}],['마을로',()=>{closeModal();leaveSchool()}],['닫기',closeModal]]);
+  function showSchoolDirectory(){const school=data.school;
+    const rows=Object.keys(school.floors).map(f=>`<section class="floor-group"><b>${f}층 · ㄱ자 복도</b><p class="option-note">왼쪽 꺾인 동</p><div class="floor-buttons">${school.floors[f].filter(r=>r.wing==='west').map(r=>`<button data-room="${safe(r.id)}" data-floor="${f}">${safe(r.name)}${school.teachers[r.id]?' · '+safe(school.teachers[r.id].name):''}</button>`).join('')}</div><p class="option-note">가로로 이어지는 동</p><div class="floor-buttons">${school.floors[f].filter(r=>r.wing==='north').map(r=>`<button data-room="${safe(r.id)}" data-floor="${f}">${safe(r.name)}${school.teachers[r.id]?' · '+safe(school.teachers[r.id].name):''}</button>`).join('')}</div></section>`).join('');
+    showModal('서라벌여중 · 층별 안내도','교실을 선택하면 벽을 통과하지 않는 경로로 안내합니다.',`<p class="option-note">${safe(school.layout_status||'학교 공간 배치는 게임용 구성입니다.')}</p><div class="school-directory">${rows}</div>`,r=>{
+      r.querySelectorAll('[data-room]').forEach(b=>b.addEventListener('click',()=>{schoolGoal={floor:Number(b.dataset.floor),room:b.dataset.room};closeModal();showToast('길 안내: '+schoolRoomData(schoolGoal.room).name)}));
+      actions(r,[['현재 층 복도로 돌아가기',()=>{closeModal();enterSchoolHall(schoolLevel());}],['마을로 이동',()=>{closeModal();leaveSchool()}],['닫기',closeModal]]);
     });
   }
   function imgReady(name){return art[name]?.complete&&art[name]?.naturalWidth>0}
   function drawSchool(c,now){const floor=schoolLevel(),room=schoolRoom(),asset=room?'school_classroom':'school_hall_'+floor;
-    if(imgReady(asset))c.drawImage(art[asset],0,0,W,H);else rect(c,0,0,W,H,room?'#e9d5bd':'#dfd5c4');
-    if(!room){const rooms=roomsFor(floor);rooms.forEach((r,i)=>{
-       const x=(3+4*i)*TILE+16;
-       rect(c,x-30,50,60,26,'#466d6a');c.textAlign='center';c.textBaseline='middle';c.fillStyle='#f6e9cd';c.font='bold 14px sans-serif';c.fillText(r.name,x,63,58);
-       if(roomsFor(floor)[i]?.kind==='class'){c.font='12px sans-serif';c.fillStyle='#3d5550';c.fillText(data.school.teachers[r.id]?.name+' 선생님',x,108,92);}
-       if(schoolGoal?.room===r.id){rect(c,x-3,120,7,9,'#f6db87');}
-    });
-    for(const x of [2,27]){rect(c,x*TILE-10,265,57,87,'#718b8a');rect(c,x*TILE-8,268,53,11,'#2e595b');c.textAlign='center';c.font='bold 12px sans-serif';c.fillStyle='#fff6da';c.fillText('계단',x*TILE+16,286)}
-    rect(c,398,546,164,36,'#507a72');c.textAlign='center';c.fillStyle='#f9f3d8';c.font='bold 17px sans-serif';c.fillText(floor===1?'↓ 정문 · 마을로':'↓ 중앙 복도',W/2,568);
-    } else{
-      const r=schoolRoomData(room),teacher=data.school.teachers[room];
-      if(r.kind==='special'){const highlight={'health':'#a9d7cc','science1':'#a7c9df','science2':'#a7c9df','science3':'#a7c9df','homemaking':'#d8b99c','music':'#d1c3de','computer':'#abc7d9','counsel':'#d5c6b8','office':'#aac7a4'}[room]||'#a7bba9';
-        for(let j=0;j<3;j++){rect(c,310+j*110,320,74,63,'#594f54');rect(c,314+j*110,325,66,43,highlight);rect(c,318+j*110,370,58,7,'#dbcbb7');}
-        c.textAlign='center';c.font='bold 16px sans-serif';c.fillStyle='#f3e6cb';rect(c,9,15,220,42,'#496864');c.fillText(r.name+' · '+(data.school.special[room]?.concept||''),118,40);
+    if(imgReady(asset))c.drawImage(art[asset],0,0,W,H);else rect(c,0,0,W,H,room?'#eadac4':'#485f62');
+    if(!room){
+      const rooms=roomsFor(floor),nearest=nearestSchoolDoor(),showNearby=nearest?.d<=4;
+      rooms.forEach((r,i)=>{const sp=r.label_position||r.door,px=sp[0]*TILE+16,py=sp[1]*TILE+16;
+        rect(c,px-15,py-10,30,21,schoolGoal?.room===r.id?'#b67e41':'#324f58');rect(c,px-13,py-8,26,17,schoolGoal?.room===r.id?'#ebbd75':'#d2c39d');
+        c.textAlign='center';c.textBaseline='middle';c.font='bold 10px sans-serif';c.fillStyle='#263e49';
+        const idx=String(i+1).padStart(2,'0');c.fillText(r.kind==='class'?r.id:idx,px,py,26);
+        const d=schoolDist(r.door,[pos.x,pos.y]);if(d<=1)rect(c,px-15,py+13,30,3,'#f7d58a');
+      });
+      for(const [name,p] of Object.entries(schoolStairs())){const [x,y]=p;
+        rect(c,x*TILE+1,y*TILE+1,30,30,'#355c65');rect(c,x*TILE+4,y*TILE+4,24,4,'#e3cd97');
+        c.textAlign='center';c.font='bold 12px sans-serif';c.fillStyle='#fff5da';c.fillText('↑↓',x*TILE+16,y*TILE+21);
       }
-      if(teacher){const index=Number(teacher.sprite_id.slice(-2)),path=teacher.sprite_id;
-         if(imgReady(path))c.drawImage(art[path],0,0,32,48,14*TILE-7,8*TILE-45,44,64);
-         c.textAlign='center';c.font='bold 13px sans-serif';c.fillStyle='#fff7df';rect(c,394,196,128,25,'#395d65');c.fillText(teacher.name+' 선생님',458,212);
+      const e=data.school.entry||[15,9];if(floor===1){rect(c,e[0]*TILE-25,e[1]*TILE+31,82,22,'#3c7364');c.fillStyle='#f8f2d8';c.font='bold 12px sans-serif';c.textAlign='center';c.fillText('중앙현관',e[0]*TILE+16,e[1]*TILE+44);}
+      rect(c,12,12,310,33,'#264953eb');c.textAlign='left';c.textBaseline='middle';c.fillStyle='#fff4d4';c.font='bold 17px sans-serif';c.fillText('서라벌여중 · '+floor+'층 ㄱ자 복도',24,32);
+      if(showNearby){const msg=nearest.name+(nearest.kind==='class'?' · '+(data.school.teachers[nearest.id]?.name||'')+' 선생님':'');
+        const bw=Math.min(385,Math.max(188,c.measureText(msg).width+34));const xp=Math.min(W-bw-12,Math.max(12,nearest.door[0]*TILE-bw/2));
+        rect(c,xp,75,bw,38,'#244450f2');rect(c,xp,75,bw,3,'#e2be84');c.textAlign='center';c.textBaseline='middle';c.font='bold 17px sans-serif';c.fillStyle='#fff3da';c.fillText(msg,xp+bw/2,96,bw-17);
       }
+      rect(c,270,555,420,34,'#24444fe0');c.textAlign='center';c.textBaseline='middle';c.font='bold 14px sans-serif';c.fillStyle='#fff0d7';
+      c.fillText(nearest?.d<=1?'✦ '+nearest.name+' — 들어가기':(floor===1?'✦ 중앙현관 · 계단 · 문패 가까이서 조사':'✦ 문패와 계단 가까이서 조사'),W/2,574,400);
+    }else{
+      const r=schoolRoomData(room),teacher=data.school.teachers[room],theme={health:'#a5d3cc',science1:'#a6c6e2',science2:'#a6c6e2',science3:'#a6c6e2',homemaking:'#debc9e',technology:'#b6c9d0',music:'#cfb5db',music2:'#cfb5db',computer:'#a3c4df',counsel:'#c5d7c9',office:'#b6c9aa',art:'#ddc1b8',gym:'#bccb98',career:'#d8baaa',korean_library:'#c1a984'}[room]||'#b6cbb5';
+      if(r.kind==='special'){
+        for(let j=0;j<3;j++){rect(c,297+j*118,313,82,67,'#635657');rect(c,303+j*118,320,70,46,theme);rect(c,310+j*118,369,56,5,'#f8eac9');}
+        if(['science1','science2','science3','computer'].includes(room)){for(let j=0;j<3;j++){rect(c,317+j*118,326,39,23,'#355e70');rect(c,322+j*118,331,29,14,'#8cced0');}}
+        if(['health','counsel'].includes(room))rect(c,330,338,256,12,'#ffffffcc');
+      }
+      if(teacher){const path=teacher.sprite_id;
+        if(imgReady(path))c.drawImage(art[path],0,0,32,48,14*TILE-7,8*TILE-45,44,64);
+        rect(c,387,196,144,25,'#395d65');c.fillStyle='#fff7df';c.textAlign='center';c.textBaseline='middle';c.font='bold 13px sans-serif';c.fillText(teacher.name+' 선생님',458,208);
+      }
+      rect(c,12,12,418,38,'#264953ef');c.textAlign='left';c.textBaseline='middle';c.font='bold 20px sans-serif';c.fillStyle='#fff1d9';c.fillText('서라벌여중 · '+r.floor_id+'층 · '+r.name,25,34,393);
       for(const o of schoolObjects()){
         const x=o.point[0]*TILE+16,y=o.point[1]*TILE+20,done=!!(state.school_records||{})[room+':'+o.id];
         if(o.id==='teacher'&&imgReady(teacher?.sprite_id)){}else if(!done){rect(c,x-5,y-11,12,13,'#f4d69b');rect(c,x-2,y-7,5,6,'#fff7d5');}
-        rect(c,x-39,y+8,78,18,done?'#516e62bb':'#385861e3');c.font='bold 11px sans-serif';c.textAlign='center';c.fillStyle=done?'#c7ddbd':'#fbe7b6';c.fillText((done?'✓ ':'✦ ')+o.label,x,y+20);
+        rect(c,x-39,y+8,78,18,done?'#516e62dd':'#385861f2');c.font='bold 11px sans-serif';c.textAlign='center';c.fillStyle=done?'#c7ddbd':'#fbe7b6';c.fillText((done?'✓ ':'✦ ')+o.label,x,y+20);
       }
       c.textAlign='center';c.fillStyle='#f7edcf';c.font='bold 14px sans-serif';rect(c,371,565,216,28,'#3d615ddd');c.fillText('↓ 출입문으로 나가기',W/2,585);
     }
@@ -253,13 +276,17 @@
     if(guideEnabled)drawSchoolGuidance(c,now);
   }
   function schoolGuidePoint(){if(!schoolGoal)return null;
-    const room=schoolRoom();if(room===schoolGoal.room)return{point:[15,8],label:'교실 안 탐험하기'};
-    if(room)return{point:[15,17],label:'먼저 교실 밖으로'};
-    if(schoolLevel()!==schoolGoal.floor)return{point:[schoolLevel()<schoolGoal.floor?27:2,12],label:schoolGoal.floor+'층 계단으로'};
-    const idx=roomsFor(schoolLevel()).findIndex(r=>r.id===schoolGoal.room);
-    return idx<0?null:{point:[3+4*idx,8],label:schoolRoomData(schoolGoal.room).name};
+    const room=schoolRoom();if(room===schoolGoal.room)return{point:[14,8],label:'교실 조사하기'};
+    if(room)return{point:[15,16],label:'먼저 교실 나가기'};
+    if(schoolLevel()!==schoolGoal.floor)return{point:schoolStairs().east,label:schoolGoal.floor+'층으로 이동'};
+    const destination=schoolRoomData(schoolGoal.room);
+    return destination?{point:destination.door,label:destination.name+' · 출입문'}:null;
   }
-  function drawSchoolGuidance(c,now){const goal=schoolGuidePoint();if(!goal)return;drawWayfinding(c,goal.point[0],goal.point[1],goal.label,now);}
+  function drawSchoolGuidance(c,now){const goal=schoolGuidePoint();if(!goal)return;
+    const step=pathNextStep(pos.x,pos.y,goal.point[0],goal.point[1],pos.zone);
+    if(step)drawWayfinding(c,step[0],step[1],goal.label,now);
+    if(guideMode==='friendly'&&routeMemo.route){for(const [x,y] of routeMemo.route.slice(0,25))rect(c,x*TILE+13,y*TILE+14,7,6,'#f1d48edd');}
+  }
   function drawWayfinding(c,gx,gy,label,now){const x=pos.x*TILE+16,y=pos.y*TILE+7,tx=gx*TILE+16,ty=gy*TILE+9;
     if(Math.abs(pos.x-gx)+Math.abs(pos.y-gy)<2)return;
     const angle=Math.atan2(ty-y,tx-x),a=x+Math.cos(angle)*45,b=y+Math.sin(angle)*45+Math.sin(now/300)*3;

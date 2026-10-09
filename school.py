@@ -25,32 +25,102 @@ TEACHERS = [
 ]
 TEACHER_MAP={homeroom:{'homeroom':homeroom,'name':name,'subject':subject,'prompt':prompt,'concept':concept,'sprite_id':f'teacher_{i:02d}'} for i,(homeroom,name,subject,prompt,concept) in enumerate(TEACHERS)}
 
+# These spaces are taken from the provided renovation brief, NOT a verified architectural plan.
+# Reuse legacy room IDs so saved school_records keep working after the map update.
 SPECIAL = {
-    'office':('행정실','학교에서 도움이 필요할 때 어디에 문의할지 찾아봐요.','policy'),
-    'health':('보건실','건강한 삶을 위해 예방과 휴식을 어떻게 실천할까요?','ret_health'),
-    'science1':('과학실 1','수명의 증가가 우리 생활에 미치는 영향을 조사해요.','aging'),
-    'science2':('과학실 2','인구구조의 변화와 기술을 연결해 봐요.','aging'),
-    'science3':('과학실 3','의료와 돌봄에서 과학기술이 할 수 있는 일을 찾아봐요.','elder_care'),
-    'counsel':('상담실','마음 건강과 관계를 돌보는 방법도 미래 준비에 포함돼요.','ret_social'),
-    'homemaking':('기술·가정실','가계 예산과 돌봄 시간을 함께 짜 볼까요?','workcare'),
-    'computer':('컴퓨터실','사회 문제를 설명하는 통계는 기준 연도와 출처도 중요해요.','low_birth'),
-    'music':('음악실','나이가 들어서도 이어갈 여가와 배움이 있어요.','ret_leisure'),
+    'student_space': ('학생자치공간', '학생들의 의견이 학교생활을 어떻게 바꿀 수 있을까요?', 'generations'),
+    'resources': ('자료실', '사회 변화에 관한 자료를 찾아보고 출처를 확인해 봐요.', 'low_birth'),
+    'health': ('보건실', '건강한 노후를 위해 지금부터 준비할 일을 찾아봐요.', 'ret_health'),
+    'support1': ('학습지원실1', '서로 다른 배움의 필요를 존중하는 학교를 떠올려 봐요.', 'generations'),
+    'admin_archive': ('행정자료실', '학교의 기록이 어떻게 우리 생활을 돕는지 살펴봐요.', 'policy'),
+    'support2': ('학습지원실2', '배움의 속도와 방법은 모두 달라도 괜찮아요.', 'values'),
+    'principal': ('교장실', '다양한 학생을 위한 학교 정책을 제안해 봐요.', 'policy'),
+    'office': ('행정실', '학교의 공적 지원과 공동체의 역할을 살펴봐요.', 'policy'),
+    'lobby': ('중앙현관', '서로를 배려하는 학교 안내와 이동 동선을 살펴봐요.', 'generations'),
+    'broadcast': ('방송실', '미래사회 관련 알림을 쉽고 공정하게 전달하려면?', 'low_birth'),
+    'staff': ('교육공무직원 공간', '학교를 움직이는 다양한 일과 역할을 찾아봐요.', 'labor'),
+    'science_staff': ('과학교과연구실', '의료 기술 발전과 기대수명 증가를 살펴봐요.', 'aging'),
+    'science1': ('과학실1', '기대수명 증가와 건강한 삶의 조건을 조사해요.', 'aging'),
+    'science2': ('과학실2', '인구 구조 변화를 보여 주는 자료의 연도를 확인해요.', 'aging'),
+    'science3': ('과학실3', '의료·돌봄 기술은 삶에 어떤 기회를 줄까요?', 'elder_care'),
+    'gym': ('체력단련실', '활기찬 생활을 위한 몸과 마음의 활동을 선택해 봐요.', 'ret_health'),
+    'english': ('영어활동실', '다른 나라의 일·생활 균형 지원 사례를 찾아봐요.', 'workcare'),
+    'year1_office': ('1학년 교무실', '협업하고 도와주는 학교의 여러 역할을 살펴봐요.', 'generations'),
+    'teacher_center': ('교무센터', '학생 지원을 위한 의사소통을 설계해 봐요.', 'policy'),
+    'art': ('미술실', '내가 꿈꾸는 미래의 생활 모습을 표현해 봐요.', 'values'),
+    'art_staff': ('미술교과연구실', '여가와 자기표현이 삶에 주는 의미를 찾아봐요.', 'ret_leisure'),
+    'it_staff': ('정보교과연구실', '다양한 직업과 기술의 변화를 비교해 봐요.', 'labor'),
+    'technology': ('기술실', '미래 일자리와 직업 역량을 탐색해 봐요.', 'labor'),
+    'homemaking': ('가정실', '가계 예산과 돌봄 시간을 함께 계획해 봐요.', 'workcare'),
+    'multi': ('다목적실', '세대 간 협력으로 함께 사용하는 공간을 생각해 봐요.', 'generations'),
+    'computer': ('컴퓨터실', '고령화 통계의 조사 연도와 기준을 비교해 봐요.', 'low_birth'),
+    'math_support': ('수학교과지원실', '주거비와 월별 저축 목표를 계산해 봐요.', 'ret_finance'),
+    'year2_office': ('2학년 교무실', '내 미래를 위한 학교의 지원을 찾아봐요.', 'policy'),
+    'career': ('진로상담실', '직업을 정할 때 어떤 가치를 먼저 고려할까요?', 'values'),
+    'self_learning': ('자기주도배움터', '나만의 학습·휴식 시간표를 설계해 봐요.', 'workcare'),
+    'counsel': ('Wee클래스', '마음 건강과 건강한 대인 관계도 미래 준비예요.', 'ret_social'),
+    'music': ('음악실1', '나이가 들어서도 이어 가고 싶은 여가를 생각해 봐요.', 'ret_leisure'),
+    'music2': ('음악실2', '함께 음악을 즐기며 세대 간 관계를 맺어 봐요.', 'ret_social'),
+    'music_staff': ('음악교과연구실', '평생 즐길 수 있는 예술·여가를 고민해 봐요.', 'ret_leisure'),
+    'year3_office': ('3학년 교무실', '각자의 진로를 준비하는 과정에서 필요한 지원을 찾아봐요.', 'policy'),
+    'korean_staff': ('국어교과공간', '다른 세대의 이야기를 듣고 글로 표현해 봐요.', 'generations'),
+    'korean_library': ('국어도서관', '다양한 가족·세대의 삶을 담은 이야기를 탐색해 봐요.', 'elder_care'),
 }
-SCHOOL_FLOORS={
-    '1':[{'id':key,'name':SPECIAL[key][0],'kind':'special'} for key in ['office','health','science1','science2','science3','counsel']],
-    '2':[{'id':str(i)+'-'+str(j),'name':str(i)+'-'+str(j)+' 교실','kind':'class'} for i in [1] for j in range(1,6)]+[{'id':'homemaking','name':'기술·가정실','kind':'special'}],
-    '3':[{'id':str(i)+'-'+str(j),'name':str(i)+'-'+str(j)+' 교실','kind':'class'} for i in [2] for j in range(1,7)]+[{'id':'computer','name':'컴퓨터실','kind':'special'}],
-    '4':[{'id':str(i)+'-'+str(j),'name':str(i)+'-'+str(j)+' 교실','kind':'class'} for i in [3] for j in range(1,7)]+[{'id':'music','name':'음악실','kind':'special'}],
+# The left segment is rotated 90° from the learning-support-room-2 corner.
+# Room order and precise dimensions remain APPROXIMATE until an actual floor plan is supplied.
+ROOM_ORDER = {
+    '1': {
+        'west': ['support2', 'admin_archive', 'support1', 'health', 'resources', 'student_space'],
+        'north': ['principal', 'office', 'lobby', 'broadcast', 'staff', 'science_staff', 'science1', 'science2', 'science3']},
+    '2': {
+        'west': ['gym', '1-5', '1-4', '1-3', '1-2'],
+        'north': ['1-1', 'english', 'year1_office', 'teacher_center', 'art', 'art_staff', 'it_staff', 'technology', 'homemaking']},
+    '3': {
+        'west': ['multi', 'computer', 'math_support', '2-1', '2-2'],
+        'north': ['2-3', '2-4', '2-5', '2-6', 'year2_office', 'career', 'self_learning', 'counsel']},
+    '4': {
+        'west': ['music', 'music2', 'music_staff', '3-1', '3-2'],
+        'north': ['3-3', '3-4', '3-5', '3-6', 'year3_office', 'korean_staff', 'korean_library']},
 }
-CLASS_OBJECTS = ['teacher','board','bulletin','desk','locker']
-SPECIAL_OBJECTS = ['board','desk','locker']
-OBJECT_LABELS = {'teacher':'담임 선생님','board':'칠판','bulletin':'게시판','desk':'책상','locker':'자료함'}
-OBJECT_POINTS = {'teacher':[14,8],'board':[9,5],'bulletin':[24,5],'desk':[11,12],'locker':[23,12]}
+# All coordinates are logical tiles in the original 30x19 canvas.
+STAIRS = {'west':[8,17], 'east':[27,10]}
+SCHOOL_ENTRY = [15,9]
+
+def hall_walkable(x: int, y: int) -> bool:
+    return (6 <= x <= 8 and 8 <= y <= 17) or (7 <= x <= 27 and 8 <= y <= 10)
+
+def build_floors():
+    floors={}
+    for floor,sides in ROOM_ORDER.items():
+        rooms=[]
+        for wing, ids in sides.items():
+            for index,room_id in enumerate(ids):
+                if room_id in TEACHER_MAP:
+                    name=f'{room_id} 교실';kind='class'
+                else:
+                    name=SPECIAL[room_id][0];kind='special'
+                door = [7,11+index] if wing=='west' else [10+index*2,8]
+                # North wing two-tile spacing provides readable index plaques.
+                sign = [5,11+index] if wing=='west' else [door[0],7]
+                rooms.append({'id':room_id,'room_id':room_id,'name':name,'display_name':name,
+                              'kind':kind,'floor_id':int(floor),'wing':wing,
+                              'door':door,'door_position':door,'label_position':sign,
+                              'interior_map_id':'school:room:'+room_id})
+        floors[floor]=rooms
+    return floors
+
+SCHOOL_FLOORS=build_floors()
+CLASS_OBJECTS=['teacher','board','bulletin','desk','locker']
+SPECIAL_OBJECTS=['board','desk','locker']
+OBJECT_LABELS={'teacher':'담임 선생님','board':'칠판','bulletin':'게시판','desk':'책상','locker':'자료함'}
+OBJECT_POINTS={'teacher':[14,8],'board':[9,5],'bulletin':[24,5],'desk':[11,12],'locker':[23,12]}
 
 def school_content():
     return {'teachers':TEACHER_MAP, 'floors':SCHOOL_FLOORS,
             'special':{k:{'name':v[0],'prompt':v[1],'concept':v[2]} for k,v in SPECIAL.items()},
-            'objects':OBJECT_LABELS,'points':OBJECT_POINTS}
+            'objects':OBJECT_LABELS,'points':OBJECT_POINTS,
+            'stairs':STAIRS,'entry':SCHOOL_ENTRY,
+            'layout_status':'교실배치도 미첨부 — ㄱ자형 구조 및 실별 위치는 검증 전 게임용 배치'}
 
 def validate_school_interaction(room: str, obj: str, choice: str):
     allowed_rooms={item['id']:item for rooms in SCHOOL_FLOORS.values() for item in rooms}

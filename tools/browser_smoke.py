@@ -79,6 +79,14 @@ with sync_playwright() as p:
     page.wait_for_timeout(200)
     assert '1-2 교실' in page.locator('#zone-label').inner_text()
     page.screenshot(path=str(ROOT/'docs'/'업데이트_교실_스크린샷.png'),full_page=True)
+    # Visual smoke: real special-room image variants must be integrated in Canvas.
+    for room_id,filename in [('science1','업데이트_과학실_스크린샷.png'),('health','업데이트_보건실_스크린샷.png')]:
+        page.evaluate('(room)=>window.__smoke.room(room)',room_id)
+        page.wait_for_timeout(180)
+        assert room_id in page.evaluate('window.__smoke.position().zone')
+        page.screenshot(path=str(ROOT/'docs'/filename),full_page=True)
+    page.evaluate('window.__smoke.room("1-2")')
+    page.wait_for_timeout(150)
     page.evaluate('window.__smoke.move(14,10)')
     page.evaluate('window.__testMessages=[];window.addEventListener("message",e=>{if(e.data?.type==="streamlit:setComponentValue")window.__testMessages.push(e.data.value)})')
     page.keyboard.press('Enter')

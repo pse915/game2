@@ -3,22 +3,22 @@
   "assets": {
     "school_exterior": {
       "file": "assets/school_exterior.png",
-      "width": 320,
-      "height": 224,
-      "purpose": "Pixel art depiction of long red-brick school facade, glass windows, canopy and green fence",
-      "source": "Original procedural pixels; text brief L-shape approximation; actual floor plan unavailable",
-      "license": "Project-generated",
-      "pixel_scale": 2,
+      "width": 480,
+      "height": 288,
+      "purpose": "School facade: curved blue metal roof, red brick, grey perpendicular wing, canopied walkway, playground",
+      "source": "user school reference / original pixel artwork",
+      "license": "Project-generated original pixels",
+      "pixel_scale": 1,
       "asset_id": "school_exterior",
       "path": "assets/school_exterior.png",
       "type": "background",
-      "frame_width": 320,
-      "frame_height": 224,
+      "frame_width": 480,
+      "frame_height": 288,
       "frames": [
         0
       ],
       "animation": {},
-      "collision": "map-data",
+      "collision": "none",
       "layer": "background",
       "anchor": "top-left"
     },
@@ -26,9 +26,9 @@
       "file": "assets/school_hall_1.png",
       "width": 960,
       "height": 608,
-      "purpose": "School hallway background, floor 1",
-      "source": "Original procedural pixels; text brief L-shape approximation; actual floor plan unavailable",
-      "license": "Project-generated",
+      "purpose": "Photo-inspired L-shaped school corridor 1: cream walls, timber mullions, terrazzo and magenta arches",
+      "source": "user school reference / original pixel artwork",
+      "license": "Project-generated original pixels",
       "pixel_scale": 2,
       "asset_id": "school_hall_1",
       "path": "assets/school_hall_1.png",
@@ -39,7 +39,7 @@
         0
       ],
       "animation": {},
-      "collision": "map-data",
+      "collision": "none",
       "layer": "background",
       "anchor": "top-left"
     },
@@ -47,9 +47,9 @@
       "file": "assets/school_hall_2.png",
       "width": 960,
       "height": 608,
-      "purpose": "School hallway background, floor 2",
-      "source": "Original procedural pixels; text brief L-shape approximation; actual floor plan unavailable",
-      "license": "Project-generated",
+      "purpose": "Photo-inspired L-shaped school corridor 2: cream walls, timber mullions, terrazzo and magenta arches",
+      "source": "user school reference / original pixel artwork",
+      "license": "Project-generated original pixels",
       "pixel_scale": 2,
       "asset_id": "school_hall_2",
       "path": "assets/school_hall_2.png",
@@ -60,7 +60,7 @@
         0
       ],
       "animation": {},
-      "collision": "map-data",
+      "collision": "none",
       "layer": "background",
       "anchor": "top-left"
     },
@@ -68,9 +68,9 @@
       "file": "assets/school_hall_3.png",
       "width": 960,
       "height": 608,
-      "purpose": "School hallway background, floor 3",
-      "source": "Original procedural pixels; text brief L-shape approximation; actual floor plan unavailable",
-      "license": "Project-generated",
+      "purpose": "Photo-inspired L-shaped school corridor 3: cream walls, timber mullions, terrazzo and magenta arches",
+      "source": "user school reference / original pixel artwork",
+      "license": "Project-generated original pixels",
       "pixel_scale": 2,
       "asset_id": "school_hall_3",
       "path": "assets/school_hall_3.png",
@@ -81,7 +81,7 @@
         0
       ],
       "animation": {},
-      "collision": "map-data",
+      "collision": "none",
       "layer": "background",
       "anchor": "top-left"
     },
@@ -89,9 +89,9 @@
       "file": "assets/school_hall_4.png",
       "width": 960,
       "height": 608,
-      "purpose": "School hallway background, floor 4",
-      "source": "Original procedural pixels; text brief L-shape approximation; actual floor plan unavailable",
-      "license": "Project-generated",
+      "purpose": "Photo-inspired L-shaped school corridor 4: cream walls, timber mullions, terrazzo and magenta arches",
+      "source": "user school reference / original pixel artwork",
+      "license": "Project-generated original pixels",
       "pixel_scale": 2,
       "asset_id": "school_hall_4",
       "path": "assets/school_hall_4.png",
@@ -102,7 +102,7 @@
         0
       ],
       "animation": {},
-      "collision": "map-data",
+      "collision": "none",
       "layer": "background",
       "anchor": "top-left"
     },
@@ -110,9 +110,9 @@
       "file": "assets/school_classroom.png",
       "width": 960,
       "height": 608,
-      "purpose": "Shared classroom art with windows, chalkboard, desks, bookcases",
-      "source": "Original pixel-art; reference: user-provided exterior photo; not reproduced",
-      "license": "Project-generated",
+      "purpose": "Photograph-informed classroom: blue chairs, off-white desks, grey frames, cabinets, roller blinds",
+      "source": "user school reference / original pixel artwork",
+      "license": "Project-generated original pixels",
       "pixel_scale": 2,
       "asset_id": "school_classroom",
       "path": "assets/school_classroom.png",
@@ -123,7 +123,7 @@
         0
       ],
       "animation": {},
-      "collision": "map-data",
+      "collision": "none",
       "layer": "background",
       "anchor": "top-left"
     },
@@ -131,13 +131,10 @@
       "file": "assets/teacher_00.png",
       "width": 128,
       "height": 192,
-      "purpose": "Original teacher sprite 0, 4 directions x 4 walking frames",
-      "source": "Original pixel-art; reference: user-provided exterior photo; not reproduced",
-      "license": "Project-generated",
+      "purpose": "Original teacher sprite with directional walking animation",
+      "source": "user school reference / original pixel artwork",
+      "license": "Project-generated original pixels",
       "pixel_scale": 2,
-      "asset_id": "teacher_00",
-      "path": "assets/teacher_00.png",
-      "type": "sprite_sheet",
       "frame_width": 32,
       "frame_height": 48,
       "frames": [
@@ -158,6 +155,9 @@
         14,
         15
       ],
+      "asset_id": "teacher_00",
+      "path": "assets/teacher_00.png",
+      "type": "sprite_sheet",
       "animation": {
         "down": [
           0,
@@ -192,13 +192,10 @@
       "file": "assets/teacher_01.png",
       "width": 128,
       "height": 192,
-      "purpose": "Original teacher sprite 1, 4 directions x 4 walking frames",
-      "source": "Original pixel-art; reference: user-provided exterior photo; not reproduced",
-      "license": "Project-generated",
+      "purpose": "Original teacher sprite with directional walking animation",
+      "source": "user school reference / original pixel artwork",
+      "license": "Project-generated original pixels",
       "pixel_scale": 2,
-      "asset_id": "teacher_01",
-      "path": "assets/teacher_01.png",
-      "type": "sprite_sheet",
       "frame_width": 32,
       "frame_height": 48,
       "frames": [
@@ -219,6 +216,9 @@
         14,
         15
       ],
+      "asset_id": "teacher_01",
+      "path": "assets/teacher_01.png",
+      "type": "sprite_sheet",
       "animation": {
         "down": [
           0,
@@ -253,13 +253,10 @@
       "file": "assets/teacher_02.png",
       "width": 128,
       "height": 192,
-      "purpose": "Original teacher sprite 2, 4 directions x 4 walking frames",
-      "source": "Original pixel-art; reference: user-provided exterior photo; not reproduced",
-      "license": "Project-generated",
+      "purpose": "Original teacher sprite with directional walking animation",
+      "source": "user school reference / original pixel artwork",
+      "license": "Project-generated original pixels",
       "pixel_scale": 2,
-      "asset_id": "teacher_02",
-      "path": "assets/teacher_02.png",
-      "type": "sprite_sheet",
       "frame_width": 32,
       "frame_height": 48,
       "frames": [
@@ -280,6 +277,9 @@
         14,
         15
       ],
+      "asset_id": "teacher_02",
+      "path": "assets/teacher_02.png",
+      "type": "sprite_sheet",
       "animation": {
         "down": [
           0,
@@ -314,13 +314,10 @@
       "file": "assets/teacher_03.png",
       "width": 128,
       "height": 192,
-      "purpose": "Original teacher sprite 3, 4 directions x 4 walking frames",
-      "source": "Original pixel-art; reference: user-provided exterior photo; not reproduced",
-      "license": "Project-generated",
+      "purpose": "Original teacher sprite with directional walking animation",
+      "source": "user school reference / original pixel artwork",
+      "license": "Project-generated original pixels",
       "pixel_scale": 2,
-      "asset_id": "teacher_03",
-      "path": "assets/teacher_03.png",
-      "type": "sprite_sheet",
       "frame_width": 32,
       "frame_height": 48,
       "frames": [
@@ -341,6 +338,9 @@
         14,
         15
       ],
+      "asset_id": "teacher_03",
+      "path": "assets/teacher_03.png",
+      "type": "sprite_sheet",
       "animation": {
         "down": [
           0,
@@ -375,13 +375,10 @@
       "file": "assets/teacher_04.png",
       "width": 128,
       "height": 192,
-      "purpose": "Original teacher sprite 4, 4 directions x 4 walking frames",
-      "source": "Original pixel-art; reference: user-provided exterior photo; not reproduced",
-      "license": "Project-generated",
+      "purpose": "Original teacher sprite with directional walking animation",
+      "source": "user school reference / original pixel artwork",
+      "license": "Project-generated original pixels",
       "pixel_scale": 2,
-      "asset_id": "teacher_04",
-      "path": "assets/teacher_04.png",
-      "type": "sprite_sheet",
       "frame_width": 32,
       "frame_height": 48,
       "frames": [
@@ -402,6 +399,9 @@
         14,
         15
       ],
+      "asset_id": "teacher_04",
+      "path": "assets/teacher_04.png",
+      "type": "sprite_sheet",
       "animation": {
         "down": [
           0,
@@ -436,13 +436,10 @@
       "file": "assets/teacher_05.png",
       "width": 128,
       "height": 192,
-      "purpose": "Original teacher sprite 5, 4 directions x 4 walking frames",
-      "source": "Original pixel-art; reference: user-provided exterior photo; not reproduced",
-      "license": "Project-generated",
+      "purpose": "Original teacher sprite with directional walking animation",
+      "source": "user school reference / original pixel artwork",
+      "license": "Project-generated original pixels",
       "pixel_scale": 2,
-      "asset_id": "teacher_05",
-      "path": "assets/teacher_05.png",
-      "type": "sprite_sheet",
       "frame_width": 32,
       "frame_height": 48,
       "frames": [
@@ -463,6 +460,9 @@
         14,
         15
       ],
+      "asset_id": "teacher_05",
+      "path": "assets/teacher_05.png",
+      "type": "sprite_sheet",
       "animation": {
         "down": [
           0,
@@ -497,13 +497,10 @@
       "file": "assets/teacher_06.png",
       "width": 128,
       "height": 192,
-      "purpose": "Original teacher sprite 6, 4 directions x 4 walking frames",
-      "source": "Original pixel-art; reference: user-provided exterior photo; not reproduced",
-      "license": "Project-generated",
+      "purpose": "Original teacher sprite with directional walking animation",
+      "source": "user school reference / original pixel artwork",
+      "license": "Project-generated original pixels",
       "pixel_scale": 2,
-      "asset_id": "teacher_06",
-      "path": "assets/teacher_06.png",
-      "type": "sprite_sheet",
       "frame_width": 32,
       "frame_height": 48,
       "frames": [
@@ -524,6 +521,9 @@
         14,
         15
       ],
+      "asset_id": "teacher_06",
+      "path": "assets/teacher_06.png",
+      "type": "sprite_sheet",
       "animation": {
         "down": [
           0,
@@ -558,13 +558,10 @@
       "file": "assets/teacher_07.png",
       "width": 128,
       "height": 192,
-      "purpose": "Original teacher sprite 7, 4 directions x 4 walking frames",
-      "source": "Original pixel-art; reference: user-provided exterior photo; not reproduced",
-      "license": "Project-generated",
+      "purpose": "Original teacher sprite with directional walking animation",
+      "source": "user school reference / original pixel artwork",
+      "license": "Project-generated original pixels",
       "pixel_scale": 2,
-      "asset_id": "teacher_07",
-      "path": "assets/teacher_07.png",
-      "type": "sprite_sheet",
       "frame_width": 32,
       "frame_height": 48,
       "frames": [
@@ -585,6 +582,9 @@
         14,
         15
       ],
+      "asset_id": "teacher_07",
+      "path": "assets/teacher_07.png",
+      "type": "sprite_sheet",
       "animation": {
         "down": [
           0,
@@ -619,13 +619,10 @@
       "file": "assets/teacher_08.png",
       "width": 128,
       "height": 192,
-      "purpose": "Original teacher sprite 8, 4 directions x 4 walking frames",
-      "source": "Original pixel-art; reference: user-provided exterior photo; not reproduced",
-      "license": "Project-generated",
+      "purpose": "Original teacher sprite with directional walking animation",
+      "source": "user school reference / original pixel artwork",
+      "license": "Project-generated original pixels",
       "pixel_scale": 2,
-      "asset_id": "teacher_08",
-      "path": "assets/teacher_08.png",
-      "type": "sprite_sheet",
       "frame_width": 32,
       "frame_height": 48,
       "frames": [
@@ -646,6 +643,9 @@
         14,
         15
       ],
+      "asset_id": "teacher_08",
+      "path": "assets/teacher_08.png",
+      "type": "sprite_sheet",
       "animation": {
         "down": [
           0,
@@ -680,13 +680,10 @@
       "file": "assets/teacher_09.png",
       "width": 128,
       "height": 192,
-      "purpose": "Original teacher sprite 9, 4 directions x 4 walking frames",
-      "source": "Original pixel-art; reference: user-provided exterior photo; not reproduced",
-      "license": "Project-generated",
+      "purpose": "Original teacher sprite with directional walking animation",
+      "source": "user school reference / original pixel artwork",
+      "license": "Project-generated original pixels",
       "pixel_scale": 2,
-      "asset_id": "teacher_09",
-      "path": "assets/teacher_09.png",
-      "type": "sprite_sheet",
       "frame_width": 32,
       "frame_height": 48,
       "frames": [
@@ -707,6 +704,9 @@
         14,
         15
       ],
+      "asset_id": "teacher_09",
+      "path": "assets/teacher_09.png",
+      "type": "sprite_sheet",
       "animation": {
         "down": [
           0,
@@ -741,13 +741,10 @@
       "file": "assets/teacher_10.png",
       "width": 128,
       "height": 192,
-      "purpose": "Original teacher sprite 10, 4 directions x 4 walking frames",
-      "source": "Original pixel-art; reference: user-provided exterior photo; not reproduced",
-      "license": "Project-generated",
+      "purpose": "Original teacher sprite with directional walking animation",
+      "source": "user school reference / original pixel artwork",
+      "license": "Project-generated original pixels",
       "pixel_scale": 2,
-      "asset_id": "teacher_10",
-      "path": "assets/teacher_10.png",
-      "type": "sprite_sheet",
       "frame_width": 32,
       "frame_height": 48,
       "frames": [
@@ -768,6 +765,9 @@
         14,
         15
       ],
+      "asset_id": "teacher_10",
+      "path": "assets/teacher_10.png",
+      "type": "sprite_sheet",
       "animation": {
         "down": [
           0,
@@ -802,13 +802,10 @@
       "file": "assets/teacher_11.png",
       "width": 128,
       "height": 192,
-      "purpose": "Original teacher sprite 11, 4 directions x 4 walking frames",
-      "source": "Original pixel-art; reference: user-provided exterior photo; not reproduced",
-      "license": "Project-generated",
+      "purpose": "Original teacher sprite with directional walking animation",
+      "source": "user school reference / original pixel artwork",
+      "license": "Project-generated original pixels",
       "pixel_scale": 2,
-      "asset_id": "teacher_11",
-      "path": "assets/teacher_11.png",
-      "type": "sprite_sheet",
       "frame_width": 32,
       "frame_height": 48,
       "frames": [
@@ -829,6 +826,9 @@
         14,
         15
       ],
+      "asset_id": "teacher_11",
+      "path": "assets/teacher_11.png",
+      "type": "sprite_sheet",
       "animation": {
         "down": [
           0,
@@ -863,13 +863,10 @@
       "file": "assets/teacher_12.png",
       "width": 128,
       "height": 192,
-      "purpose": "Original teacher sprite 12, 4 directions x 4 walking frames",
-      "source": "Original pixel-art; reference: user-provided exterior photo; not reproduced",
-      "license": "Project-generated",
+      "purpose": "Original teacher sprite with directional walking animation",
+      "source": "user school reference / original pixel artwork",
+      "license": "Project-generated original pixels",
       "pixel_scale": 2,
-      "asset_id": "teacher_12",
-      "path": "assets/teacher_12.png",
-      "type": "sprite_sheet",
       "frame_width": 32,
       "frame_height": 48,
       "frames": [
@@ -890,6 +887,9 @@
         14,
         15
       ],
+      "asset_id": "teacher_12",
+      "path": "assets/teacher_12.png",
+      "type": "sprite_sheet",
       "animation": {
         "down": [
           0,
@@ -924,13 +924,10 @@
       "file": "assets/teacher_13.png",
       "width": 128,
       "height": 192,
-      "purpose": "Original teacher sprite 13, 4 directions x 4 walking frames",
-      "source": "Original pixel-art; reference: user-provided exterior photo; not reproduced",
-      "license": "Project-generated",
+      "purpose": "Original teacher sprite with directional walking animation",
+      "source": "user school reference / original pixel artwork",
+      "license": "Project-generated original pixels",
       "pixel_scale": 2,
-      "asset_id": "teacher_13",
-      "path": "assets/teacher_13.png",
-      "type": "sprite_sheet",
       "frame_width": 32,
       "frame_height": 48,
       "frames": [
@@ -951,6 +948,9 @@
         14,
         15
       ],
+      "asset_id": "teacher_13",
+      "path": "assets/teacher_13.png",
+      "type": "sprite_sheet",
       "animation": {
         "down": [
           0,
@@ -985,13 +985,10 @@
       "file": "assets/teacher_14.png",
       "width": 128,
       "height": 192,
-      "purpose": "Original teacher sprite 14, 4 directions x 4 walking frames",
-      "source": "Original pixel-art; reference: user-provided exterior photo; not reproduced",
-      "license": "Project-generated",
+      "purpose": "Original teacher sprite with directional walking animation",
+      "source": "user school reference / original pixel artwork",
+      "license": "Project-generated original pixels",
       "pixel_scale": 2,
-      "asset_id": "teacher_14",
-      "path": "assets/teacher_14.png",
-      "type": "sprite_sheet",
       "frame_width": 32,
       "frame_height": 48,
       "frames": [
@@ -1012,6 +1009,9 @@
         14,
         15
       ],
+      "asset_id": "teacher_14",
+      "path": "assets/teacher_14.png",
+      "type": "sprite_sheet",
       "animation": {
         "down": [
           0,
@@ -1046,13 +1046,10 @@
       "file": "assets/teacher_15.png",
       "width": 128,
       "height": 192,
-      "purpose": "Original teacher sprite 15, 4 directions x 4 walking frames",
-      "source": "Original pixel-art; reference: user-provided exterior photo; not reproduced",
-      "license": "Project-generated",
+      "purpose": "Original teacher sprite with directional walking animation",
+      "source": "user school reference / original pixel artwork",
+      "license": "Project-generated original pixels",
       "pixel_scale": 2,
-      "asset_id": "teacher_15",
-      "path": "assets/teacher_15.png",
-      "type": "sprite_sheet",
       "frame_width": 32,
       "frame_height": 48,
       "frames": [
@@ -1073,6 +1070,9 @@
         14,
         15
       ],
+      "asset_id": "teacher_15",
+      "path": "assets/teacher_15.png",
+      "type": "sprite_sheet",
       "animation": {
         "down": [
           0,
@@ -1107,13 +1107,10 @@
       "file": "assets/teacher_16.png",
       "width": 128,
       "height": 192,
-      "purpose": "Original teacher sprite 16, 4 directions x 4 walking frames",
-      "source": "Original pixel-art; reference: user-provided exterior photo; not reproduced",
-      "license": "Project-generated",
+      "purpose": "Original teacher sprite with directional walking animation",
+      "source": "user school reference / original pixel artwork",
+      "license": "Project-generated original pixels",
       "pixel_scale": 2,
-      "asset_id": "teacher_16",
-      "path": "assets/teacher_16.png",
-      "type": "sprite_sheet",
       "frame_width": 32,
       "frame_height": 48,
       "frames": [
@@ -1134,6 +1131,9 @@
         14,
         15
       ],
+      "asset_id": "teacher_16",
+      "path": "assets/teacher_16.png",
+      "type": "sprite_sheet",
       "animation": {
         "down": [
           0,
@@ -1290,8 +1290,8 @@
       "file": "assets/interior_bread.png",
       "width": 960,
       "height": 608,
-      "purpose": "빵집 bespoke interior background",
-      "source": "Original Python-generated pixel art",
+      "purpose": "빵집 distinctive photo-inspired RPG interior",
+      "source": "Original pixel environment designed for this game",
       "license": "Project-generated",
       "asset_id": "interior_bread",
       "path": "assets/interior_bread.png",
@@ -1302,7 +1302,7 @@
         0
       ],
       "animation": {},
-      "collision": "none",
+      "collision": "separate_map",
       "layer": "background",
       "anchor": "top-left"
     },
@@ -1310,8 +1310,8 @@
       "file": "assets/interior_cafe.png",
       "width": 960,
       "height": 608,
-      "purpose": "카페 bespoke interior background",
-      "source": "Original Python-generated pixel art",
+      "purpose": "카페 distinctive photo-inspired RPG interior",
+      "source": "Original pixel environment designed for this game",
       "license": "Project-generated",
       "asset_id": "interior_cafe",
       "path": "assets/interior_cafe.png",
@@ -1322,7 +1322,7 @@
         0
       ],
       "animation": {},
-      "collision": "none",
+      "collision": "separate_map",
       "layer": "background",
       "anchor": "top-left"
     },
@@ -1330,8 +1330,8 @@
       "file": "assets/interior_closed.png",
       "width": 960,
       "height": 608,
-      "purpose": "새로운 공간 bespoke interior background",
-      "source": "Original Python-generated pixel art",
+      "purpose": "새로운 공간 distinctive photo-inspired RPG interior",
+      "source": "Original pixel environment designed for this game",
       "license": "Project-generated",
       "asset_id": "interior_closed",
       "path": "assets/interior_closed.png",
@@ -1342,7 +1342,7 @@
         0
       ],
       "animation": {},
-      "collision": "none",
+      "collision": "separate_map",
       "layer": "background",
       "anchor": "top-left"
     },
@@ -1350,8 +1350,8 @@
       "file": "assets/interior_hall.png",
       "width": 960,
       "height": 608,
-      "purpose": "마을회관 bespoke interior background",
-      "source": "Original Python-generated pixel art",
+      "purpose": "마을회관 distinctive photo-inspired RPG interior",
+      "source": "Original pixel environment designed for this game",
       "license": "Project-generated",
       "asset_id": "interior_hall",
       "path": "assets/interior_hall.png",
@@ -1362,7 +1362,7 @@
         0
       ],
       "animation": {},
-      "collision": "none",
+      "collision": "separate_map",
       "layer": "background",
       "anchor": "top-left"
     },
@@ -1370,8 +1370,8 @@
       "file": "assets/interior_library.png",
       "width": 960,
       "height": 608,
-      "purpose": "도서관 bespoke interior background",
-      "source": "Original Python-generated pixel art",
+      "purpose": "도서관 distinctive photo-inspired RPG interior",
+      "source": "Original pixel environment designed for this game",
       "license": "Project-generated",
       "asset_id": "interior_library",
       "path": "assets/interior_library.png",
@@ -1382,7 +1382,7 @@
         0
       ],
       "animation": {},
-      "collision": "none",
+      "collision": "separate_map",
       "layer": "background",
       "anchor": "top-left"
     },
@@ -1390,8 +1390,8 @@
       "file": "assets/interior_factory.png",
       "width": 960,
       "height": 608,
-      "purpose": "공방 bespoke interior background",
-      "source": "Original Python-generated pixel art",
+      "purpose": "공방 distinctive photo-inspired RPG interior",
+      "source": "Original pixel environment designed for this game",
       "license": "Project-generated",
       "asset_id": "interior_factory",
       "path": "assets/interior_factory.png",
@@ -1402,7 +1402,7 @@
         0
       ],
       "animation": {},
-      "collision": "none",
+      "collision": "separate_map",
       "layer": "background",
       "anchor": "top-left"
     },
@@ -1410,8 +1410,8 @@
       "file": "assets/interior_office.png",
       "width": 960,
       "height": 608,
-      "purpose": "사무실 bespoke interior background",
-      "source": "Original Python-generated pixel art",
+      "purpose": "사무실 distinctive photo-inspired RPG interior",
+      "source": "Original pixel environment designed for this game",
       "license": "Project-generated",
       "asset_id": "interior_office",
       "path": "assets/interior_office.png",
@@ -1422,7 +1422,7 @@
         0
       ],
       "animation": {},
-      "collision": "none",
+      "collision": "separate_map",
       "layer": "background",
       "anchor": "top-left"
     },
@@ -1430,8 +1430,8 @@
       "file": "assets/interior_home.png",
       "width": 960,
       "height": 608,
-      "purpose": "공동주거 bespoke interior background",
-      "source": "Original Python-generated pixel art",
+      "purpose": "공동주거 distinctive photo-inspired RPG interior",
+      "source": "Original pixel environment designed for this game",
       "license": "Project-generated",
       "asset_id": "interior_home",
       "path": "assets/interior_home.png",
@@ -1442,7 +1442,7 @@
         0
       ],
       "animation": {},
-      "collision": "none",
+      "collision": "separate_map",
       "layer": "background",
       "anchor": "top-left"
     },
@@ -1450,8 +1450,8 @@
       "file": "assets/interior_house.png",
       "width": 960,
       "height": 608,
-      "purpose": "주거공간 bespoke interior background",
-      "source": "Original Python-generated pixel art",
+      "purpose": "주거공간 distinctive photo-inspired RPG interior",
+      "source": "Original pixel environment designed for this game",
       "license": "Project-generated",
       "asset_id": "interior_house",
       "path": "assets/interior_house.png",
@@ -1462,7 +1462,7 @@
         0
       ],
       "animation": {},
-      "collision": "none",
+      "collision": "separate_map",
       "layer": "background",
       "anchor": "top-left"
     },
@@ -1470,8 +1470,8 @@
       "file": "assets/interior_clinic.png",
       "width": 960,
       "height": 608,
-      "purpose": "보건시설 bespoke interior background",
-      "source": "Original Python-generated pixel art",
+      "purpose": "보건시설 distinctive photo-inspired RPG interior",
+      "source": "Original pixel environment designed for this game",
       "license": "Project-generated",
       "asset_id": "interior_clinic",
       "path": "assets/interior_clinic.png",
@@ -1482,7 +1482,7 @@
         0
       ],
       "animation": {},
-      "collision": "none",
+      "collision": "separate_map",
       "layer": "background",
       "anchor": "top-left"
     },
@@ -1490,8 +1490,8 @@
       "file": "assets/interior_care.png",
       "width": 960,
       "height": 608,
-      "purpose": "돌봄공간 bespoke interior background",
-      "source": "Original Python-generated pixel art",
+      "purpose": "돌봄공간 distinctive photo-inspired RPG interior",
+      "source": "Original pixel environment designed for this game",
       "license": "Project-generated",
       "asset_id": "interior_care",
       "path": "assets/interior_care.png",
@@ -1502,7 +1502,7 @@
         0
       ],
       "animation": {},
-      "collision": "none",
+      "collision": "separate_map",
       "layer": "background",
       "anchor": "top-left"
     },
@@ -1510,8 +1510,8 @@
       "file": "assets/interior_school.png",
       "width": 960,
       "height": 608,
-      "purpose": "배움공간 bespoke interior background",
-      "source": "Original Python-generated pixel art",
+      "purpose": "배움공간 distinctive photo-inspired RPG interior",
+      "source": "Original pixel environment designed for this game",
       "license": "Project-generated",
       "asset_id": "interior_school",
       "path": "assets/interior_school.png",
@@ -1522,7 +1522,7 @@
         0
       ],
       "animation": {},
-      "collision": "none",
+      "collision": "separate_map",
       "layer": "background",
       "anchor": "top-left"
     },
@@ -1530,8 +1530,8 @@
       "file": "assets/interior_theater.png",
       "width": 960,
       "height": 608,
-      "purpose": "작은 극장 bespoke interior background",
-      "source": "Original Python-generated pixel art",
+      "purpose": "극장 distinctive photo-inspired RPG interior",
+      "source": "Original pixel environment designed for this game",
       "license": "Project-generated",
       "asset_id": "interior_theater",
       "path": "assets/interior_theater.png",
@@ -1542,7 +1542,929 @@
         0
       ],
       "animation": {},
+      "collision": "separate_map",
+      "layer": "background",
+      "anchor": "top-left"
+    },
+    "building_cafe": {
+      "file": "assets/building_cafe.png",
+      "width": 320,
+      "height": 232,
+      "purpose": "cafe uniquely shaped town building sprite",
+      "source": "user school reference / original pixel artwork",
+      "license": "Project-generated original pixels",
+      "pixel_scale": 2,
+      "asset_id": "building_cafe",
+      "path": "assets/building_cafe.png",
+      "type": "object",
+      "frame_width": 320,
+      "frame_height": 232,
+      "frames": [
+        0
+      ],
+      "animation": {},
+      "collision": "separate_map",
+      "layer": "buildings",
+      "anchor": "bottom-center"
+    },
+    "building_bread": {
+      "file": "assets/building_bread.png",
+      "width": 320,
+      "height": 232,
+      "purpose": "bread uniquely shaped town building sprite",
+      "source": "user school reference / original pixel artwork",
+      "license": "Project-generated original pixels",
+      "pixel_scale": 2,
+      "asset_id": "building_bread",
+      "path": "assets/building_bread.png",
+      "type": "object",
+      "frame_width": 320,
+      "frame_height": 232,
+      "frames": [
+        0
+      ],
+      "animation": {},
+      "collision": "separate_map",
+      "layer": "buildings",
+      "anchor": "bottom-center"
+    },
+    "building_hall": {
+      "file": "assets/building_hall.png",
+      "width": 320,
+      "height": 232,
+      "purpose": "hall uniquely shaped town building sprite",
+      "source": "user school reference / original pixel artwork",
+      "license": "Project-generated original pixels",
+      "pixel_scale": 2,
+      "asset_id": "building_hall",
+      "path": "assets/building_hall.png",
+      "type": "object",
+      "frame_width": 320,
+      "frame_height": 232,
+      "frames": [
+        0
+      ],
+      "animation": {},
+      "collision": "separate_map",
+      "layer": "buildings",
+      "anchor": "bottom-center"
+    },
+    "building_office": {
+      "file": "assets/building_office.png",
+      "width": 320,
+      "height": 232,
+      "purpose": "office uniquely shaped town building sprite",
+      "source": "user school reference / original pixel artwork",
+      "license": "Project-generated original pixels",
+      "pixel_scale": 2,
+      "asset_id": "building_office",
+      "path": "assets/building_office.png",
+      "type": "object",
+      "frame_width": 320,
+      "frame_height": 232,
+      "frames": [
+        0
+      ],
+      "animation": {},
+      "collision": "separate_map",
+      "layer": "buildings",
+      "anchor": "bottom-center"
+    },
+    "building_home": {
+      "file": "assets/building_home.png",
+      "width": 320,
+      "height": 232,
+      "purpose": "home uniquely shaped town building sprite",
+      "source": "user school reference / original pixel artwork",
+      "license": "Project-generated original pixels",
+      "pixel_scale": 2,
+      "asset_id": "building_home",
+      "path": "assets/building_home.png",
+      "type": "object",
+      "frame_width": 320,
+      "frame_height": 232,
+      "frames": [
+        0
+      ],
+      "animation": {},
+      "collision": "separate_map",
+      "layer": "buildings",
+      "anchor": "bottom-center"
+    },
+    "building_house": {
+      "file": "assets/building_house.png",
+      "width": 320,
+      "height": 232,
+      "purpose": "house uniquely shaped town building sprite",
+      "source": "user school reference / original pixel artwork",
+      "license": "Project-generated original pixels",
+      "pixel_scale": 2,
+      "asset_id": "building_house",
+      "path": "assets/building_house.png",
+      "type": "object",
+      "frame_width": 320,
+      "frame_height": 232,
+      "frames": [
+        0
+      ],
+      "animation": {},
+      "collision": "separate_map",
+      "layer": "buildings",
+      "anchor": "bottom-center"
+    },
+    "building_clinic": {
+      "file": "assets/building_clinic.png",
+      "width": 320,
+      "height": 232,
+      "purpose": "clinic uniquely shaped town building sprite",
+      "source": "user school reference / original pixel artwork",
+      "license": "Project-generated original pixels",
+      "pixel_scale": 2,
+      "asset_id": "building_clinic",
+      "path": "assets/building_clinic.png",
+      "type": "object",
+      "frame_width": 320,
+      "frame_height": 232,
+      "frames": [
+        0
+      ],
+      "animation": {},
+      "collision": "separate_map",
+      "layer": "buildings",
+      "anchor": "bottom-center"
+    },
+    "building_care": {
+      "file": "assets/building_care.png",
+      "width": 320,
+      "height": 232,
+      "purpose": "care uniquely shaped town building sprite",
+      "source": "user school reference / original pixel artwork",
+      "license": "Project-generated original pixels",
+      "pixel_scale": 2,
+      "asset_id": "building_care",
+      "path": "assets/building_care.png",
+      "type": "object",
+      "frame_width": 320,
+      "frame_height": 232,
+      "frames": [
+        0
+      ],
+      "animation": {},
+      "collision": "separate_map",
+      "layer": "buildings",
+      "anchor": "bottom-center"
+    },
+    "building_factory": {
+      "file": "assets/building_factory.png",
+      "width": 320,
+      "height": 232,
+      "purpose": "factory uniquely shaped town building sprite",
+      "source": "user school reference / original pixel artwork",
+      "license": "Project-generated original pixels",
+      "pixel_scale": 2,
+      "asset_id": "building_factory",
+      "path": "assets/building_factory.png",
+      "type": "object",
+      "frame_width": 320,
+      "frame_height": 232,
+      "frames": [
+        0
+      ],
+      "animation": {},
+      "collision": "separate_map",
+      "layer": "buildings",
+      "anchor": "bottom-center"
+    },
+    "building_closed": {
+      "file": "assets/building_closed.png",
+      "width": 320,
+      "height": 232,
+      "purpose": "closed uniquely shaped town building sprite",
+      "source": "user school reference / original pixel artwork",
+      "license": "Project-generated original pixels",
+      "pixel_scale": 2,
+      "asset_id": "building_closed",
+      "path": "assets/building_closed.png",
+      "type": "object",
+      "frame_width": 320,
+      "frame_height": 232,
+      "frames": [
+        0
+      ],
+      "animation": {},
+      "collision": "separate_map",
+      "layer": "buildings",
+      "anchor": "bottom-center"
+    },
+    "building_library": {
+      "file": "assets/building_library.png",
+      "width": 320,
+      "height": 232,
+      "purpose": "library uniquely shaped town building sprite",
+      "source": "user school reference / original pixel artwork",
+      "license": "Project-generated original pixels",
+      "pixel_scale": 2,
+      "asset_id": "building_library",
+      "path": "assets/building_library.png",
+      "type": "object",
+      "frame_width": 320,
+      "frame_height": 232,
+      "frames": [
+        0
+      ],
+      "animation": {},
+      "collision": "separate_map",
+      "layer": "buildings",
+      "anchor": "bottom-center"
+    },
+    "building_school": {
+      "file": "assets/building_school.png",
+      "width": 320,
+      "height": 232,
+      "purpose": "school uniquely shaped town building sprite",
+      "source": "user school reference / original pixel artwork",
+      "license": "Project-generated original pixels",
+      "pixel_scale": 2,
+      "asset_id": "building_school",
+      "path": "assets/building_school.png",
+      "type": "object",
+      "frame_width": 320,
+      "frame_height": 232,
+      "frames": [
+        0
+      ],
+      "animation": {},
+      "collision": "separate_map",
+      "layer": "buildings",
+      "anchor": "bottom-center"
+    },
+    "building_theater": {
+      "file": "assets/building_theater.png",
+      "width": 320,
+      "height": 232,
+      "purpose": "theater uniquely shaped town building sprite",
+      "source": "user school reference / original pixel artwork",
+      "license": "Project-generated original pixels",
+      "pixel_scale": 2,
+      "asset_id": "building_theater",
+      "path": "assets/building_theater.png",
+      "type": "object",
+      "frame_width": 320,
+      "frame_height": 232,
+      "frames": [
+        0
+      ],
+      "animation": {},
+      "collision": "separate_map",
+      "layer": "buildings",
+      "anchor": "bottom-center"
+    },
+    "tree_0": {
+      "file": "assets/tree_0.png",
+      "width": 76,
+      "height": 94,
+      "purpose": "Detailed town tree canopy and trunk",
+      "source": "user school reference / original pixel artwork",
+      "license": "Project-generated original pixels",
+      "pixel_scale": 2,
+      "asset_id": "tree_0",
+      "path": "assets/tree_0.png",
+      "type": "object",
+      "frame_width": 76,
+      "frame_height": 94,
+      "frames": [
+        0
+      ],
+      "animation": {},
       "collision": "none",
+      "layer": "background",
+      "anchor": "bottom-center"
+    },
+    "tree_1": {
+      "file": "assets/tree_1.png",
+      "width": 76,
+      "height": 94,
+      "purpose": "Detailed town tree canopy and trunk",
+      "source": "user school reference / original pixel artwork",
+      "license": "Project-generated original pixels",
+      "pixel_scale": 2,
+      "asset_id": "tree_1",
+      "path": "assets/tree_1.png",
+      "type": "object",
+      "frame_width": 76,
+      "frame_height": 94,
+      "frames": [
+        0
+      ],
+      "animation": {},
+      "collision": "none",
+      "layer": "background",
+      "anchor": "bottom-center"
+    },
+    "tree_2": {
+      "file": "assets/tree_2.png",
+      "width": 76,
+      "height": 94,
+      "purpose": "Detailed town tree canopy and trunk",
+      "source": "user school reference / original pixel artwork",
+      "license": "Project-generated original pixels",
+      "pixel_scale": 2,
+      "asset_id": "tree_2",
+      "path": "assets/tree_2.png",
+      "type": "object",
+      "frame_width": 76,
+      "frame_height": 94,
+      "frames": [
+        0
+      ],
+      "animation": {},
+      "collision": "none",
+      "layer": "background",
+      "anchor": "bottom-center"
+    },
+    "avatar_0": {
+      "file": "assets/avatar_0.png",
+      "width": 128,
+      "height": 192,
+      "purpose": "Original 4-direction, 4-frame player animation",
+      "source": "user school reference / original pixel artwork",
+      "license": "Project-generated original pixels",
+      "pixel_scale": 2,
+      "frame_width": 32,
+      "frame_height": 48,
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "asset_id": "avatar_0",
+      "path": "assets/avatar_0.png",
+      "type": "sprite_sheet",
+      "animation": {
+        "down": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "left": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "right": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "up": [
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      "collision": "none",
+      "layer": "entities",
+      "anchor": "feet"
+    },
+    "avatar_1": {
+      "file": "assets/avatar_1.png",
+      "width": 128,
+      "height": 192,
+      "purpose": "Original 4-direction, 4-frame player animation",
+      "source": "user school reference / original pixel artwork",
+      "license": "Project-generated original pixels",
+      "pixel_scale": 2,
+      "frame_width": 32,
+      "frame_height": 48,
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "asset_id": "avatar_1",
+      "path": "assets/avatar_1.png",
+      "type": "sprite_sheet",
+      "animation": {
+        "down": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "left": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "right": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "up": [
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      "collision": "none",
+      "layer": "entities",
+      "anchor": "feet"
+    },
+    "avatar_2": {
+      "file": "assets/avatar_2.png",
+      "width": 128,
+      "height": 192,
+      "purpose": "Original 4-direction, 4-frame player animation",
+      "source": "user school reference / original pixel artwork",
+      "license": "Project-generated original pixels",
+      "pixel_scale": 2,
+      "frame_width": 32,
+      "frame_height": 48,
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "asset_id": "avatar_2",
+      "path": "assets/avatar_2.png",
+      "type": "sprite_sheet",
+      "animation": {
+        "down": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "left": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "right": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "up": [
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      "collision": "none",
+      "layer": "entities",
+      "anchor": "feet"
+    },
+    "avatar_3": {
+      "file": "assets/avatar_3.png",
+      "width": 128,
+      "height": 192,
+      "purpose": "Original 4-direction, 4-frame player animation",
+      "source": "user school reference / original pixel artwork",
+      "license": "Project-generated original pixels",
+      "pixel_scale": 2,
+      "frame_width": 32,
+      "frame_height": 48,
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "asset_id": "avatar_3",
+      "path": "assets/avatar_3.png",
+      "type": "sprite_sheet",
+      "animation": {
+        "down": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "left": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "right": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "up": [
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      "collision": "none",
+      "layer": "entities",
+      "anchor": "feet"
+    },
+    "avatar_4": {
+      "file": "assets/avatar_4.png",
+      "width": 128,
+      "height": 192,
+      "purpose": "Original 4-direction, 4-frame player animation",
+      "source": "user school reference / original pixel artwork",
+      "license": "Project-generated original pixels",
+      "pixel_scale": 2,
+      "frame_width": 32,
+      "frame_height": 48,
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "asset_id": "avatar_4",
+      "path": "assets/avatar_4.png",
+      "type": "sprite_sheet",
+      "animation": {
+        "down": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "left": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "right": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "up": [
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      "collision": "none",
+      "layer": "entities",
+      "anchor": "feet"
+    },
+    "avatar_5": {
+      "file": "assets/avatar_5.png",
+      "width": 128,
+      "height": 192,
+      "purpose": "Original 4-direction, 4-frame player animation",
+      "source": "user school reference / original pixel artwork",
+      "license": "Project-generated original pixels",
+      "pixel_scale": 2,
+      "frame_width": 32,
+      "frame_height": 48,
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "asset_id": "avatar_5",
+      "path": "assets/avatar_5.png",
+      "type": "sprite_sheet",
+      "animation": {
+        "down": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "left": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "right": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "up": [
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      "collision": "none",
+      "layer": "entities",
+      "anchor": "feet"
+    },
+    "school_room_science": {
+      "asset_id": "school_room_science",
+      "path": "assets/school_room_science.png",
+      "file": "assets/school_room_science.png",
+      "width": 960,
+      "height": 608,
+      "purpose": "Photo-inspired playable cutaway science classroom",
+      "source": "original programmatically drawn pixel art, user photo material reference",
+      "license": "Project-generated original pixels",
+      "type": "background",
+      "frame_width": 960,
+      "frame_height": 608,
+      "frames": [
+        0
+      ],
+      "animation": {},
+      "collision": "separate_map",
+      "layer": "background",
+      "anchor": "top-left"
+    },
+    "school_room_technology": {
+      "asset_id": "school_room_technology",
+      "path": "assets/school_room_technology.png",
+      "file": "assets/school_room_technology.png",
+      "width": 960,
+      "height": 608,
+      "purpose": "Photo-inspired playable cutaway technology classroom",
+      "source": "original programmatically drawn pixel art, user photo material reference",
+      "license": "Project-generated original pixels",
+      "type": "background",
+      "frame_width": 960,
+      "frame_height": 608,
+      "frames": [
+        0
+      ],
+      "animation": {},
+      "collision": "separate_map",
+      "layer": "background",
+      "anchor": "top-left"
+    },
+    "school_room_homemaking": {
+      "asset_id": "school_room_homemaking",
+      "path": "assets/school_room_homemaking.png",
+      "file": "assets/school_room_homemaking.png",
+      "width": 960,
+      "height": 608,
+      "purpose": "Photo-inspired playable cutaway homemaking classroom",
+      "source": "original programmatically drawn pixel art, user photo material reference",
+      "license": "Project-generated original pixels",
+      "type": "background",
+      "frame_width": 960,
+      "frame_height": 608,
+      "frames": [
+        0
+      ],
+      "animation": {},
+      "collision": "separate_map",
+      "layer": "background",
+      "anchor": "top-left"
+    },
+    "school_room_computer": {
+      "asset_id": "school_room_computer",
+      "path": "assets/school_room_computer.png",
+      "file": "assets/school_room_computer.png",
+      "width": 960,
+      "height": 608,
+      "purpose": "Photo-inspired playable cutaway computer classroom",
+      "source": "original programmatically drawn pixel art, user photo material reference",
+      "license": "Project-generated original pixels",
+      "type": "background",
+      "frame_width": 960,
+      "frame_height": 608,
+      "frames": [
+        0
+      ],
+      "animation": {},
+      "collision": "separate_map",
+      "layer": "background",
+      "anchor": "top-left"
+    },
+    "school_room_music": {
+      "asset_id": "school_room_music",
+      "path": "assets/school_room_music.png",
+      "file": "assets/school_room_music.png",
+      "width": 960,
+      "height": 608,
+      "purpose": "Photo-inspired playable cutaway music classroom",
+      "source": "original programmatically drawn pixel art, user photo material reference",
+      "license": "Project-generated original pixels",
+      "type": "background",
+      "frame_width": 960,
+      "frame_height": 608,
+      "frames": [
+        0
+      ],
+      "animation": {},
+      "collision": "separate_map",
+      "layer": "background",
+      "anchor": "top-left"
+    },
+    "school_room_art": {
+      "asset_id": "school_room_art",
+      "path": "assets/school_room_art.png",
+      "file": "assets/school_room_art.png",
+      "width": 960,
+      "height": 608,
+      "purpose": "Photo-inspired playable cutaway art classroom",
+      "source": "original programmatically drawn pixel art, user photo material reference",
+      "license": "Project-generated original pixels",
+      "type": "background",
+      "frame_width": 960,
+      "frame_height": 608,
+      "frames": [
+        0
+      ],
+      "animation": {},
+      "collision": "separate_map",
+      "layer": "background",
+      "anchor": "top-left"
+    },
+    "school_room_health": {
+      "asset_id": "school_room_health",
+      "path": "assets/school_room_health.png",
+      "file": "assets/school_room_health.png",
+      "width": 960,
+      "height": 608,
+      "purpose": "Photo-inspired playable cutaway health classroom",
+      "source": "original programmatically drawn pixel art, user photo material reference",
+      "license": "Project-generated original pixels",
+      "type": "background",
+      "frame_width": 960,
+      "frame_height": 608,
+      "frames": [
+        0
+      ],
+      "animation": {},
+      "collision": "separate_map",
+      "layer": "background",
+      "anchor": "top-left"
+    },
+    "school_room_library": {
+      "asset_id": "school_room_library",
+      "path": "assets/school_room_library.png",
+      "file": "assets/school_room_library.png",
+      "width": 960,
+      "height": 608,
+      "purpose": "Photo-inspired playable cutaway library classroom",
+      "source": "original programmatically drawn pixel art, user photo material reference",
+      "license": "Project-generated original pixels",
+      "type": "background",
+      "frame_width": 960,
+      "frame_height": 608,
+      "frames": [
+        0
+      ],
+      "animation": {},
+      "collision": "separate_map",
+      "layer": "background",
+      "anchor": "top-left"
+    },
+    "school_room_counsel": {
+      "asset_id": "school_room_counsel",
+      "path": "assets/school_room_counsel.png",
+      "file": "assets/school_room_counsel.png",
+      "width": 960,
+      "height": 608,
+      "purpose": "Photo-inspired playable cutaway counsel classroom",
+      "source": "original programmatically drawn pixel art, user photo material reference",
+      "license": "Project-generated original pixels",
+      "type": "background",
+      "frame_width": 960,
+      "frame_height": 608,
+      "frames": [
+        0
+      ],
+      "animation": {},
+      "collision": "separate_map",
+      "layer": "background",
+      "anchor": "top-left"
+    },
+    "school_room_office": {
+      "asset_id": "school_room_office",
+      "path": "assets/school_room_office.png",
+      "file": "assets/school_room_office.png",
+      "width": 960,
+      "height": 608,
+      "purpose": "Photo-inspired playable cutaway office classroom",
+      "source": "original programmatically drawn pixel art, user photo material reference",
+      "license": "Project-generated original pixels",
+      "type": "background",
+      "frame_width": 960,
+      "frame_height": 608,
+      "frames": [
+        0
+      ],
+      "animation": {},
+      "collision": "separate_map",
+      "layer": "background",
+      "anchor": "top-left"
+    },
+    "school_room_gym": {
+      "asset_id": "school_room_gym",
+      "path": "assets/school_room_gym.png",
+      "file": "assets/school_room_gym.png",
+      "width": 960,
+      "height": 608,
+      "purpose": "Photo-inspired playable cutaway gym classroom",
+      "source": "original programmatically drawn pixel art, user photo material reference",
+      "license": "Project-generated original pixels",
+      "type": "background",
+      "frame_width": 960,
+      "frame_height": 608,
+      "frames": [
+        0
+      ],
+      "animation": {},
+      "collision": "separate_map",
       "layer": "background",
       "anchor": "top-left"
     }
